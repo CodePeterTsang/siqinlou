@@ -28,8 +28,8 @@ export const sgListApi = (query: SgListQuery) =>
 export const sgMerge = (query: MergeCaQuery) =>
   req.post("/api/ca/merge", query);
 
-export const setFeeLimitApi = (data: number) =>
-  req.post("/api/jcz/edit/year", data);
+export const setFeeLimitApi = (query: { maxYear: number }) =>
+  req.post("/api/jcz/edit/year", query);
 
 export const jczApi = (query: JczQuery) => req.post("/api/jcz/query", query);
 
@@ -54,3 +54,9 @@ export const userCreateApi = (query: {
   userName: string;
   password: string;
 }) => req.post("/api/user/create", query);
+
+/**
+ * 查询寄存证最大年数查询
+ */
+
+export const maxYearApi = () => req.post("/api/jcz/query/year");

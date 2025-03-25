@@ -4,15 +4,17 @@ import { DatePicker, Space } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 type FieldType = {
-  wbrDesc: string;
+  jczDesc: string;
 };
 
 export default function Note({
-  wbrDesc,
+  jczDesc,
   noteDisabled,
+  valuesChangeCb,
 }: {
-  wbrDesc: string | undefined;
+  jczDesc: string | undefined;
   noteDisabled: boolean | undefined;
+  valuesChangeCb: (value: FieldType) => void;
 }) {
   const { token } = theme.useToken();
 
@@ -27,19 +29,27 @@ export default function Note({
   ) => {
     console.log("Failed:", errorInfo);
   };
+
+  const onValuesChange: FormProps<FieldType>["onValuesChange"] = (
+    values,
+    allValues
+  ) => {
+    valuesChangeCb(allValues);
+  };
   return (
     <main>
       <div>
         <Form
           name="note"
-          initialValues={{ wbrDesc: wbrDesc }}
+          initialValues={{ jczDesc: jczDesc }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
+          onValuesChange={onValuesChange}
           autoComplete="off"
         >
           <Form.Item<FieldType>
             label="寄存证备注"
-            name="wbrDesc"
+            name="jczDesc"
             style={{ width: "100%" }}
           >
             <TextArea

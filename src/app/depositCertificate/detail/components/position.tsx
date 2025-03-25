@@ -28,6 +28,7 @@ export default function Position({
   isNewJcz,
   roomNo,
   caNo,
+  disabled,
 }: {
   cb: ({ roomNo, caNo }: { roomNo: string; caNo: string }) => void;
   print: () => void;
@@ -35,6 +36,7 @@ export default function Position({
   isNewJcz: boolean;
   roomNo?: string;
   caNo?: string;
+  disabled: boolean;
 }) {
   const roomList = useRoomList();
   const setRoomList = useSetRoomList();
@@ -131,6 +133,7 @@ export default function Position({
               geRef.current?.focus();
             }}
             options={roomList}
+            disabled={disabled}
           />
         </Form.Item>
         <Form.Item<FieldType> label="寄存格" name="caNo">
@@ -148,6 +151,7 @@ export default function Position({
             }}
             ref={geRef}
             options={geList}
+            disabled={disabled}
           />
         </Form.Item>
         <Form.Item<FieldType> label="格类型" name="caType">

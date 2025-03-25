@@ -31,13 +31,10 @@ export default function Home() {
             role: data.role,
           })
         );
-        router.push("/room");
+        router.push("/depositCertificate");
       }
     } catch (e: any) {
-      const { data } = e.response;
-      if (data?.errorMessage) {
-        messageApi.error(data.errorMessage);
-      }
+      messageApi.error(e?.errorMessage);
     }
 
     return;

@@ -53,6 +53,7 @@ export interface XRDataType {
 }
 
 export interface JCZDataType {
+  id?: string;
   jczNo: string;
   roomNo?: string;
   caNo?: string;
@@ -90,6 +91,7 @@ export interface JXDataType {
   fwMoney?: string;
   jcMoney?: string;
   jfDesc?: string;
+  yearCount?: string;
 }
 
 export interface JfDataType {

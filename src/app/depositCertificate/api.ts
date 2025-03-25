@@ -41,6 +41,7 @@ interface JczEditQuery {
   phoneNum?: string;
   wbrDesc?: string;
   wbrId?: string;
+  jczDesc?: string;
 }
 
 interface OutsideBoxQuery {
@@ -84,3 +85,6 @@ export const createJczApi = (query: JczCreateQuery) =>
   req.post("/api/jcz/create", query);
 
 export const jfdPayApi = (query: JfPay) => req.post("/api/jfd/pay", query);
+
+export const cancelJczApi = (query: { jczNo: string; operator: string }) =>
+  req.post("/api/jcz/cancel", query);

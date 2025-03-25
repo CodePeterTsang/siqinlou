@@ -2,11 +2,11 @@
 import { Table, theme } from "antd";
 // import { useRouter } from 'next/navigation';
 import AvaForm from "./AvaForm";
-import { columns, data } from "./column";
+import { columns, data, expandColumns } from "./column";
 // import Layout from "@/components/Layout";
 import styles from "./index.module.less";
 import { useCallback, useEffect, useState } from "react";
-import { JCZFilter } from "@/utils/types";
+import { JCZFilter, JXDataType } from "@/utils/types";
 import { jczApi } from "../api";
 import { useSetRoomList } from "@/utils/store/useConfigStore";
 
@@ -15,6 +15,9 @@ export default function User() {
   const [listData, setListData] = useState(data);
   const [pageSize, setPageSize] = useState(5);
   const [pageNum, setPageNum] = useState(1);
+  const [selectedList, setSelectedList] = useState<JXDataType[] | undefined>(
+    []
+  );
   const [total, setTotal] = useState(0);
   const [jczFilter, setJCZFilter] = useState<JCZFilter>({ roomNo: "A101" });
   const setRoomList = useSetRoomList();
@@ -42,6 +45,17 @@ export default function User() {
     setPageNum(page);
     setPageSize(pageSize);
   }, []);
+
+  const expandedRowRender = useCallback(() => {
+    return (
+      <Table<JXDataType>
+        rowKey="id"
+        columns={expandColumns}
+        dataSource={selectedList || []}
+        pagination={false}
+      />
+    );
+  }, [selectedList]);
 
   useEffect(() => {
     setRoomList();
@@ -72,6 +86,12 @@ export default function User() {
               current: pageNum,
               onChange: onPaginationChange,
               total,
+            }}
+            expandable={{
+              expandedRowRender,
+              onExpand: (expanded, record) => {
+                setSelectedList(record.jfList);
+              },
             }}
           />
         </div>

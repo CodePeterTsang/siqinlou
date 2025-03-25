@@ -1,4 +1,6 @@
-import { Space, type TableProps } from "antd";
+import { JCZDataType, JXDataType } from "@/utils/types";
+import { Space, TableColumnsType, type TableProps } from "antd";
+import Link from "next/link";
 
 interface DataType {
   key: string;
@@ -17,7 +19,7 @@ const caTypeMap = {
   4: "四格",
 };
 
-const columns: TableProps<DataType>["columns"] = [
+const columns: TableProps<JCZDataType>["columns"] = [
   {
     title: "寄存证编号",
     dataIndex: "jczNo",
@@ -56,12 +58,28 @@ const columns: TableProps<DataType>["columns"] = [
     key: "action",
     render: (_, record) => (
       <Space size="middle">
-        <a>详情</a>
+        <Link
+          href={`/depositCertificate/detail?roomNo=${record.roomNo}&caNo=${record.caNo}`}
+        >
+          详情
+        </Link>
       </Space>
     ),
   },
 ];
 
-const data: DataType[] = [];
+const expandColumns: TableColumnsType<JXDataType> = [
+  { title: "缴费单号", dataIndex: "jfNo", key: "jfNo" },
+  { title: "金额", dataIndex: "money", key: "money" },
 
-export { columns, data };
+  { title: "数量", dataIndex: "jfCount", key: "jfCount" },
+  { title: "起年份", dataIndex: "startYear", key: "startYear" },
+  { title: "止年份", dataIndex: "endYear", key: "endYear" },
+  { title: "年数", dataIndex: "yearCount", key: "yearCount" },
+  { title: "缴费类型", dataIndex: "type", key: "type" },
+  { title: "缴费日期", dataIndex: "created", key: "created" },
+];
+
+const data: JCZDataType[] = [];
+
+export { columns, data, expandColumns };

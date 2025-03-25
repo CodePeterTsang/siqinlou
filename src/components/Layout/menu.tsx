@@ -39,15 +39,15 @@ const getNavList = () => {
       icon: <DesktopOutlined />,
       label: "寄存格管理",
       children: [
-        {
-          key: "/room",
-          icon: <BarChartOutlined />,
-          label: "室格列表",
-        },
+        // {
+        //   key: "/room",
+        //   icon: <BarChartOutlined />,
+        //   label: "室格列表",
+        // },
         {
           key: "/room/geManagement",
           icon: <FundOutlined />,
-          label: "格管理",
+          label: "室格列表",
         },
       ],
     },
@@ -59,7 +59,7 @@ const getNavList = () => {
         {
           key: "/depositCertificate/list",
           icon: <OpenAIOutlined />,
-          label: "寄存证列表",
+          label: "寄存证搜索",
         },
         {
           key: "/depositCertificate/detail",

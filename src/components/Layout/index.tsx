@@ -51,6 +51,7 @@ const CommonLayout: React.FC<IProps> = ({
   const pathname = usePathname();
   const navList = getNavList();
 
+  const [userName, setUserName] = useState("");
   const handleSelect = (row: { key: string }) => {
     if (row.key.includes("http")) {
       window.open(row.key);
@@ -70,15 +71,6 @@ const CommonLayout: React.FC<IProps> = ({
   };
 
   const items: MenuProps["items"] = [
-    // {
-    //   key: "1",
-    //   label: (
-    //     <a target="_blank" rel="noopener noreferrer" href="#">
-    //       个人中心
-    //     </a>
-    //   ),
-    // },
-
     {
       key: "3",
       label: (
@@ -88,6 +80,14 @@ const CommonLayout: React.FC<IProps> = ({
       ),
     },
   ];
+
+  useEffect(() => {
+    const userData = getUser();
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserName(user.userName);
+    }
+  }, []);
 
   return (
     <ConfigProvider
@@ -139,9 +139,9 @@ const CommonLayout: React.FC<IProps> = ({
                 <div className={styles.avatar}>
                   <Dropdown menu={{ items }} placement="bottomLeft" arrow>
                     <Avatar
-                      style={{ color: "#fff", backgroundColor: colorTextBase }}
+                      style={{ color: "#fff", backgroundColor: "#1677ff" }}
                     >
-                      Admin
+                      {userName}
                     </Avatar>
                   </Dropdown>
                 </div>

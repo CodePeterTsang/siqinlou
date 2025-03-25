@@ -76,6 +76,21 @@ const AdvancedSearchForm = ({
         },
       ],
     },
+    {
+      label: "注销状态",
+      key: "status",
+      placeholder: "请选择注销状态",
+      options: [
+        {
+          value: 0,
+          label: "否",
+        },
+        {
+          value: 1,
+          label: "是",
+        },
+      ],
+    },
   ];
   const formStyle: React.CSSProperties = {
     maxWidth: "none",
@@ -84,7 +99,7 @@ const AdvancedSearchForm = ({
     padding: 24,
   };
   useEffect(() => {
-    onFilter({ roomNo: "A101" });
+    onFilter({});
   }, [onFilter]);
   return (
     <Form
@@ -94,7 +109,6 @@ const AdvancedSearchForm = ({
       onFinish={(value) => {
         onFilter(value);
       }}
-      initialValues={{ roomNo: "A101" }}
     >
       <Row gutter={24}>
         {searchLabels.map((item, index) => (

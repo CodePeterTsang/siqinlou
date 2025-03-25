@@ -11,9 +11,10 @@ import {
   Table,
   theme,
 } from "antd";
-import { setFeeLimitApi } from "../api";
+import { maxYearApi, setFeeLimitApi } from "../api";
 import { message } from "antd";
 import dayjs from "dayjs";
+import { useEffect } from "react";
 export default function User() {
   const { token } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
@@ -36,11 +37,21 @@ export default function User() {
   const onFinish = async (values: any) => {
     console.log("Received values of form: ", values);
     try {
-      await setFeeLimitApi(parseInt(dayjs(values.field).format("YYYY")));
+      await setFeeLimitApi({
+        maxYear: parseInt(dayjs(values.field).format("YYYY")),
+      });
     } catch (e) {
       console.log(e);
     }
   };
+
+  useEffect(() => {
+    async function getYear() {
+      const { data } = await maxYearApi();
+      form.setFieldValue("year", data);
+    }
+    getYear();
+  }, []);
 
   return (
     <main>
@@ -55,7 +66,7 @@ export default function User() {
           <Row gutter={24}>
             <Col span={16} key={1}>
               <Form.Item
-                name={`field`}
+                name="year"
                 label="设置缴费年限"
                 rules={[
                   {

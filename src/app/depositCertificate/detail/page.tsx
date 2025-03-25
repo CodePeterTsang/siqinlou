@@ -14,6 +14,7 @@ import {
 import styles from "./index.module.less";
 import { getUrlParams } from "@/utils/params";
 import {
+  cancelJczApi,
   createJczApi,
   createJczNo,
   jczApi,
@@ -30,7 +31,14 @@ import Position from "./components/position";
 import Agent from "./components/agent";
 import PrintContent from "./components/printContent";
 import { useReactToPrint } from "react-to-print";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { JCZDataType, XRDataType } from "@/utils/types";
 import dayjs from "dayjs";
@@ -47,6 +55,11 @@ type XrFieldType = {
   xrName?: string;
   created?: string;
 };
+let USER = { userName: "", role: "admin" };
+const user = getUser();
+if (user) {
+  USER = JSON.parse(user);
+}
 
 export default function DepositCertificateDetail() {
   const { token } = theme.useToken();
@@ -95,8 +108,10 @@ export default function DepositCertificateDetail() {
           caNo,
         };
         const { data } = await jczApi(query);
-        if (data) {
+        if (data.length) {
           setDetailData(data[0]);
+        } else {
+          setDetailData({ roomNo, caNo, jczNo: "" });
         }
       }
     },
@@ -110,15 +125,21 @@ export default function DepositCertificateDetail() {
     reactToPrintFn();
   };
 
-  const handleCancelCertificate = useCallback(() => {
+  const handleCancelCertificate = useCallback(async () => {
+    try {
+      await cancelJczApi({ jczNo: detailData?.jczNo, operator: USER.userName });
+      messageApi.success("注销成功");
+    } catch (e: any) {
+      messageApi.error(e?.errorMessage);
+    }
     setCancelCertificate(false);
-  }, []);
+  }, [detailData?.jczNo, messageApi]);
 
   // 修改证
   const handleReviseCertificate = useCallback(
     async (isReviseCertificate: boolean) => {
       if (isReviseCertificate) {
-        const { jczNo, wbrName, address, phoneNum, wbrId, wbrDesc } =
+        const { jczNo, wbrName, address, phoneNum, wbrId, wbrDesc, jczDesc } =
           detailData;
         try {
           await jczEdit({
@@ -128,6 +149,7 @@ export default function DepositCertificateDetail() {
             phoneNum,
             wbrId,
             wbrDesc,
+            jczDesc,
           });
         } catch (e) {
           messageApi.open({
@@ -233,10 +255,9 @@ export default function DepositCertificateDetail() {
         return;
       }
       try {
-        const user = JSON.parse(getUser() || "");
         await createJczApi({
           ...detailData,
-          operator: user.role,
+          operator: USER.userName,
           isDiscount: hasDiscount ? 1 : 0,
         });
       } catch (e) {
@@ -260,14 +281,13 @@ export default function DepositCertificateDetail() {
 
   const handlePay = async () => {
     try {
-      const user = JSON.parse(getUser() || "");
       const startYear = detailData.jfEndYear ? detailData.jfEndYear : 0 + 1;
       const endYear = parseInt(startYear as string) + feeCount;
       await jfdPayApi({
         jczNo: detailData.jczNo,
         startYear: `${startYear}`,
         endYear: `${endYear}`,
-        operator: user.role,
+        operator: USER.userName,
         yearCount: `${feeCount}`,
         money: `${
           feeCount * (detailData.caType ? detailData.caType : 0) * 150
@@ -280,11 +300,27 @@ export default function DepositCertificateDetail() {
       });
       setShowFee(true);
       messageApi.success("缴费成功");
-    } catch (e) {
-      messageApi.error("缴费失败");
+    } catch (e: any) {
+      messageApi.error(e.errorMessage);
     }
     setShowFeeDetail(false);
   };
+
+  const handleAllStatus = useCallback(
+    (openStatus: Dispatch<SetStateAction<boolean>>) => {
+      if (detailData) {
+        setShowFeeDetail(false);
+        setOutsideBox(false);
+        setReviseCertificate(false);
+        setCancelCertificate(false);
+        setShowFee(false);
+        setInsideBox(false);
+      }
+      setAskDiscount(false);
+      openStatus(true);
+    },
+    [detailData]
+  );
 
   useEffect(() => {
     const url = `${searchParams}`;
@@ -310,28 +346,18 @@ export default function DepositCertificateDetail() {
         <div style={{ textAlign: "left" }}>
           <Space size="small">
             <Button
+              disabled={!detailData.jczNo}
               onClick={() => {
-                if (detailData) {
-                  setInsideBox(true);
-                }
+                handleAllStatus(setInsideBox);
               }}
             >
               迁入盒
             </Button>
-            {/* <Button
-              onClick={() => {
-                if (detailData) {
-                  setReviseBox(true);
-                }
-              }}
-            >
-              修改盒
-            </Button> */}
+
             <Button
+              disabled={!detailData.jczNo}
               onClick={() => {
-                if (detailData) {
-                  setOutsideBox(true);
-                }
+                handleAllStatus(setOutsideBox);
               }}
             >
               迁出盒
@@ -339,47 +365,47 @@ export default function DepositCertificateDetail() {
             <Button
               disabled={addCertificate}
               onClick={() => {
-                setAskDiscount(true);
+                handleAllStatus(setAskDiscount);
               }}
             >
               新增证
             </Button>
             <Button
-              disabled={addCertificate}
+              disabled={addCertificate || !detailData.jczNo}
               onClick={() => {
-                if (detailData) {
-                  setReviseCertificate(true);
-                }
+                handleAllStatus(setReviseCertificate);
               }}
             >
               修改证
             </Button>
+            {USER.role === "admin" ? (
+              <Button
+                disabled={addCertificate || !detailData.jczNo}
+                onClick={() => {
+                  handleAllStatus(setCancelCertificate);
+                }}
+              >
+                注销证
+              </Button>
+            ) : (
+              ""
+            )}
+
             <Button
-              disabled={addCertificate}
-              onClick={() => {
-                if (detailData) {
-                  setCancelCertificate(true);
-                }
-              }}
-            >
-              注销证
-            </Button>
-            <Button
-              disabled={addCertificate}
+              disabled={addCertificate || !detailData.jczNo}
               type="primary"
               onClick={() => {
                 // printFee();
-
-                setShowFeeDetail(true);
+                handleAllStatus(setShowFeeDetail);
               }}
             >
               缴费
             </Button>
             <Button
-              disabled={addCertificate}
+              disabled={addCertificate || !detailData.jczNo}
               type="primary"
               onClick={() => {
-                setShowFee(true);
+                handleAllStatus(setShowFee);
               }}
             >
               缴费单
@@ -515,6 +541,7 @@ export default function DepositCertificateDetail() {
               isNewJcz={addCertificate}
               roomNo={urlParams.roomNo}
               caNo={urlParams.caNo}
+              disabled={showFeeDetail}
             />
           </Card>
           <Card
@@ -576,7 +603,16 @@ export default function DepositCertificateDetail() {
           marginBottom: "5px",
         }}
       >
-        <Note wbrDesc={detailData?.wbrDesc} noteDisabled={reviseCertificate} />
+        <Note
+          jczDesc={detailData?.jczDesc}
+          noteDisabled={!reviseCertificate}
+          valuesChangeCb={(value) => {
+            setDetailData({
+              ...detailData,
+              ...value,
+            });
+          }}
+        />
       </Card>
       <Flex justify="space-between" align="start">
         <Card

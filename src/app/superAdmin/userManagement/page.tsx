@@ -60,10 +60,7 @@ export default function User() {
         userNo: editContent?.userNo,
       });
     } catch (e: any) {
-      const { data } = e.response;
-      if (data?.errorMessage) {
-        messageApi.error(data.errorMessage);
-      }
+      messageApi.error(e.errorMessage);
     }
   }, [editContent?.userNo, editForm, messageApi]);
 
@@ -76,10 +73,7 @@ export default function User() {
 
       setIsAdd(false);
     } catch (e: any) {
-      const { data } = e.response;
-      if (data?.errorMessage) {
-        messageApi.error(data.errorMessage);
-      }
+      messageApi.error(e.errorMessage);
     }
   }, [addForm, messageApi]);
 
