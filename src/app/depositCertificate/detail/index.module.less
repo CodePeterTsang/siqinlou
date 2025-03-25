@@ -1,0 +1,114 @@
+.deposit-certificate-detail {
+  padding: 10px;
+  :global {
+    .ant-input-borderless[disabled] {
+      color: rgba(0, 0, 0, 0.88);
+    }
+  }
+}
+.certificate-width {
+  :global {
+    .ant-form-item-row {
+      width: 200px;
+    }
+  }
+}
+.agent-width {
+  :global {
+    .ant-form-item-row {
+      width: 250px;
+      margin-bottom: 3px;
+    }
+  }
+}
+
+.print-content {
+  font-family: "Hiragino Sans GB";
+  color: black;
+  width: 16cm;
+  height: 10cm;
+  font-size: 14px;
+  line-height: 20px;
+  .item-title {
+    color: red;
+    width: 2cm;
+  }
+  .line {
+    display: flex;
+    align-items: center;
+    height: 1cm;
+  }
+
+  .title {
+    text-align: center;
+  }
+  .time {
+    margin-top: 1cm;
+    text-align: center;
+    span {
+      width: 40px;
+      display: inline-block;
+    }
+    .year-font,
+    .month-font,
+    .day-font {
+      color: red;
+    }
+  }
+  .money > div {
+    width: 33%;
+  }
+  .charge-man {
+    p {
+      width: 30%;
+    }
+  }
+}
+
+@media print {
+  .print-content {
+    font-family: "Hiragino Sans GB";
+    color: black;
+    width: 15cm;
+    height: 10cm;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 1cm 0.5cm;
+    .item-title {
+      color: red;
+      width: 2cm;
+      opacity: 0;
+    }
+    .line {
+      display: flex;
+      align-items: center;
+      height: 1cm;
+    }
+
+    .title {
+      text-align: center;
+    }
+    .time {
+      margin-top: 1cm;
+      text-align: center;
+      span {
+        width: 40px;
+        display: inline-block;
+      }
+      .year-font,
+      .month-font,
+      .day-font {
+        color: red;
+        opacity: 0;
+      }
+    }
+    .money > div {
+      width: 33%;
+    }
+    .charge-man {
+      p {
+        width: 30%;
+      }
+    }
+  }
+}
