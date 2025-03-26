@@ -43,7 +43,12 @@ import { useSearchParams } from "next/navigation";
 import { JCZDataType, XRDataType } from "@/utils/types";
 import dayjs from "dayjs";
 import { getUser } from "@/utils/auth";
-
+import React from "react";
+import dynamic from "next/dynamic";
+const NoSSR = (props: any) => <React.Fragment>{props.children}</React.Fragment>;
+const DynamicSidebarWithNoSSR = dynamic(() => Promise.resolve(NoSSR), {
+  ssr: false,
+});
 // type FieldType = {
 //   username?: string;
 //   created?: string;
@@ -55,11 +60,6 @@ type XrFieldType = {
   xrName?: string;
   created?: string;
 };
-let USER = { userName: "", role: "admin" };
-const user = getUser();
-if (user) {
-  USER = JSON.parse(user);
-}
 
 export default function DepositCertificateDetail() {
   const { token } = theme.useToken();
@@ -70,6 +70,7 @@ export default function DepositCertificateDetail() {
   const [showFee, setShowFee] = useState<boolean>(false);
   const [showFeeDetail, setShowFeeDetail] = useState<boolean>(false);
   const [feeCount, setFeeCount] = useState<number>(0);
+  const [userData, setUserData] = useState({ userName: "", role: "admin" });
 
   // 修改证
   const [reviseCertificate, setReviseCertificate] = useState<boolean>(false);
@@ -127,7 +128,10 @@ export default function DepositCertificateDetail() {
 
   const handleCancelCertificate = useCallback(async () => {
     try {
-      await cancelJczApi({ jczNo: detailData?.jczNo, operator: USER.userName });
+      await cancelJczApi({
+        jczNo: detailData?.jczNo,
+        operator: userData.userName,
+      });
       messageApi.success("注销成功");
     } catch (e: any) {
       messageApi.error(e?.errorMessage);
@@ -257,7 +261,7 @@ export default function DepositCertificateDetail() {
       try {
         await createJczApi({
           ...detailData,
-          operator: USER.userName,
+          operator: userData.userName,
           isDiscount: hasDiscount ? 1 : 0,
         });
       } catch (e) {
@@ -287,7 +291,7 @@ export default function DepositCertificateDetail() {
         jczNo: detailData.jczNo,
         startYear: `${startYear}`,
         endYear: `${endYear}`,
-        operator: USER.userName,
+        operator: userData.userName,
         yearCount: `${feeCount}`,
         money: `${
           feeCount * (detailData.caType ? detailData.caType : 0) * 150
@@ -324,7 +328,6 @@ export default function DepositCertificateDetail() {
 
   useEffect(() => {
     const url = `${searchParams}`;
-    console.log(getUrlParams(url));
     const param = getUrlParams(url);
     if (param) {
       setUrlParams({
@@ -333,6 +336,13 @@ export default function DepositCertificateDetail() {
       });
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const user = getUser();
+    if (user) {
+      setUserData(JSON.parse(user));
+    }
+  }, []);
 
   return (
     <div className={styles["deposit-certificate-detail"]}>
@@ -343,75 +353,88 @@ export default function DepositCertificateDetail() {
         {/* <PrintContent ref={contentRef} /> */}
       </div>
       <div>
-        <div style={{ textAlign: "left" }}>
-          <Space size="small">
-            <Button
-              disabled={!detailData.jczNo}
-              onClick={() => {
-                handleAllStatus(setInsideBox);
-              }}
-            >
-              迁入盒
-            </Button>
-
-            <Button
-              disabled={!detailData.jczNo}
-              onClick={() => {
-                handleAllStatus(setOutsideBox);
-              }}
-            >
-              迁出盒
-            </Button>
-            <Button
-              disabled={addCertificate}
-              onClick={() => {
-                handleAllStatus(setAskDiscount);
-              }}
-            >
-              新增证
-            </Button>
-            <Button
-              disabled={addCertificate || !detailData.jczNo}
-              onClick={() => {
-                handleAllStatus(setReviseCertificate);
-              }}
-            >
-              修改证
-            </Button>
-            {USER.role === "admin" ? (
+        <DynamicSidebarWithNoSSR>
+          <div style={{ textAlign: "left" }}>
+            <Space size="small">
+              {userData.role === "admin" ? (
+                <Button
+                  disabled={!detailData.jczNo}
+                  onClick={() => {
+                    handleAllStatus(setInsideBox);
+                  }}
+                >
+                  迁入盒
+                </Button>
+              ) : (
+                ""
+              )}
+              {userData.role === "admin" ? (
+                <Button
+                  disabled={!detailData.jczNo}
+                  onClick={() => {
+                    handleAllStatus(setOutsideBox);
+                  }}
+                >
+                  迁出盒
+                </Button>
+              ) : (
+                ""
+              )}
+              {userData.role === "admin" ? (
+                <Button
+                  disabled={addCertificate}
+                  onClick={() => {
+                    handleAllStatus(setAskDiscount);
+                  }}
+                >
+                  新增证
+                </Button>
+              ) : (
+                ""
+              )}
               <Button
                 disabled={addCertificate || !detailData.jczNo}
                 onClick={() => {
-                  handleAllStatus(setCancelCertificate);
+                  handleAllStatus(setReviseCertificate);
                 }}
               >
-                注销证
+                修改证
               </Button>
-            ) : (
-              ""
-            )}
+              {userData.role === "admin" ? (
+                <Button
+                  disabled={addCertificate || !detailData.jczNo}
+                  onClick={() => {
+                    handleAllStatus(setCancelCertificate);
+                  }}
+                >
+                  注销证
+                </Button>
+              ) : (
+                ""
+              )}
 
-            <Button
-              disabled={addCertificate || !detailData.jczNo}
-              type="primary"
-              onClick={() => {
-                // printFee();
-                handleAllStatus(setShowFeeDetail);
-              }}
-            >
-              缴费
-            </Button>
-            <Button
-              disabled={addCertificate || !detailData.jczNo}
-              type="primary"
-              onClick={() => {
-                handleAllStatus(setShowFee);
-              }}
-            >
-              缴费单
-            </Button>
-          </Space>
-        </div>
+              <Button
+                disabled={addCertificate || !detailData.jczNo}
+                type="primary"
+                onClick={() => {
+                  // printFee();
+                  handleAllStatus(setShowFeeDetail);
+                }}
+              >
+                缴费
+              </Button>
+              <Button
+                disabled={addCertificate || !detailData.jczNo}
+                type="primary"
+                onClick={() => {
+                  handleAllStatus(setShowFee);
+                }}
+              >
+                缴费单
+              </Button>
+            </Space>
+          </div>
+        </DynamicSidebarWithNoSSR>
       </div>
       <br />
       {addCertificate ? (
@@ -535,7 +558,8 @@ export default function DepositCertificateDetail() {
             <Position
               cb={getDepositCertificateDetail}
               print={() => {
-                printFee();
+                // printFee();
+                handleAllStatus(setShowFeeDetail);
               }}
               caType={detailData?.caType}
               isNewJcz={addCertificate}

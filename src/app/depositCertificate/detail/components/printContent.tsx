@@ -5,6 +5,7 @@ import styles from "./../index.module.less";
 import classNames from "classnames";
 import { JCZDataType, JXDataType } from "@/utils/types";
 import dayjs from "dayjs";
+import { number2text } from "@/utils/changeUnit";
 
 export default forwardRef(function PrintContent(
   props: { data: JCZDataType },
@@ -61,13 +62,21 @@ export default forwardRef(function PrintContent(
 
           <div>
             <p>
-              <span className={styles["item-title"]}>金额：</span>
+              <span
+                className={classNames(styles["item-title"], styles["jin-e"])}
+              >
+                金额：
+              </span>
               <span className={styles["item-one-money"]}>
                 {jxData?.fwMoney}
               </span>
             </p>
             <p>
-              <span className={styles["item-title"]}>金额：</span>
+              <span
+                className={classNames(styles["item-title"], styles["jin-e"])}
+              >
+                金额：
+              </span>
               <span className={styles["item-two-money"]}>
                 {jxData?.jcMoney}
               </span>
@@ -86,10 +95,15 @@ export default forwardRef(function PrintContent(
           <span className={styles["item-title"]}>所属位置</span>
 
           <p>
-            <span className={styles["room-no"]}>{props.data?.roomNo}</span>室号
-            <span className={styles["ca-no"]}>{props.data?.caNo}</span>穴号
-            <span className={styles["start-year"]}>2021</span>至
-            <span className={styles["end-year"]}>2021</span>
+            <span className={styles["room-no"]}>{props.data?.roomNo}</span>
+            <span className={styles["no-show"]}>室号</span>
+            <span className={styles["ca-no"]}>{props.data?.caNo}</span>
+            <span className={styles["no-show"]}>穴号</span>
+
+            <span className={styles["start-year"]}>{jxData?.startYear}</span>
+            <span className={styles["no-show"]}>至</span>
+
+            <span className={styles["end-year"]}>{jxData?.endYear}</span>
           </p>
         </div>
         <div className={classNames(styles.rmb, styles.line)}>
@@ -98,7 +112,9 @@ export default forwardRef(function PrintContent(
             <br />
             (大写)
           </span>
-          <span className={styles.up}></span>
+          <span className={styles.up}>
+            {number2text(parseInt(jxData?.money || "0"))}
+          </span>
         </div>
         <div className={classNames(styles.note, styles.line)}>
           <span className={styles["item-title"]}>备注：</span>

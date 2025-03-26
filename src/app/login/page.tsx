@@ -31,7 +31,7 @@ export default function Home() {
             role: data.role,
           })
         );
-        router.push("/depositCertificate");
+        router.push("/depositCertificate/detail");
       }
     } catch (e: any) {
       messageApi.error(e?.errorMessage);

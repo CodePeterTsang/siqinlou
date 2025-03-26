@@ -9,6 +9,7 @@ import {
   theme,
   message,
   Button,
+  Select,
 } from "antd";
 // import { useRouter } from 'next/navigation';
 import AvaForm from "./AvaForm";
@@ -22,6 +23,7 @@ type UserFieldType = {
   userName?: string;
   password?: string;
   newPassword: string;
+  role: string;
 };
 export default function User() {
   const { token } = theme.useToken();
@@ -59,6 +61,7 @@ export default function User() {
         ...editForm.getFieldsValue(),
         userNo: editContent?.userNo,
       });
+      setIsEdit(false);
     } catch (e: any) {
       messageApi.error(e.errorMessage);
     }
@@ -101,7 +104,7 @@ export default function User() {
       title: "角色",
       dataIndex: "role",
       key: "role",
-      render: (role) => (role === "admin" ? "超级管理员" : "使用者"),
+      render: (role) => (role === "admin" ? "超级管理员" : "操作员"),
     },
     {
       title: "操作",
@@ -126,10 +129,18 @@ export default function User() {
   }, []);
 
   useEffect(() => {
+    if (isAdd || isEdit) {
+      initUserList();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdd, isEdit]);
+
+  useEffect(() => {
     if (isEdit) {
       editForm.setFieldsValue({
         userName: editContent?.userName,
         password: editContent?.password,
+        role: editContent?.role,
       });
     } else {
       initUserList();
@@ -202,6 +213,27 @@ export default function User() {
           >
             <Input.Password />
           </Form.Item>
+          <Form.Item<UserFieldType>
+            label="权限"
+            name="role"
+            rules={[{ required: true, message: "请输入密码!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="请选择权限"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "admin",
+                  label: "管理员",
+                },
+                {
+                  value: "operator",
+                  label: "操作员",
+                },
+              ]}
+            ></Select>
+          </Form.Item>
         </Form>
       </Modal>
       <Modal
@@ -241,6 +273,28 @@ export default function User() {
             rules={[{ required: true, message: "请输入密码!" }]}
           >
             <Input.Password />
+          </Form.Item>
+
+          <Form.Item<UserFieldType>
+            label="权限"
+            name="role"
+            rules={[{ required: true, message: "请输入密码!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="请选择权限"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "admin",
+                  label: "管理员",
+                },
+                {
+                  value: "operator",
+                  label: "操作员",
+                },
+              ]}
+            ></Select>
           </Form.Item>
         </Form>
       </Modal>

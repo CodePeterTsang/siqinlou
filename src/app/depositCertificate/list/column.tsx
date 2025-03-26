@@ -1,5 +1,6 @@
 import { JCZDataType, JXDataType } from "@/utils/types";
 import { Space, TableColumnsType, type TableProps } from "antd";
+import dayjs from "dayjs";
 import Link from "next/link";
 
 interface DataType {
@@ -25,14 +26,12 @@ const columns: TableProps<JCZDataType>["columns"] = [
     dataIndex: "jczNo",
     key: "jczNo",
     fixed: "left",
-    width: 150,
   },
   {
     title: "室号",
     dataIndex: "roomNo",
     key: "roomNo",
     fixed: "left",
-    width: 100,
   },
   {
     title: "格号",
@@ -52,7 +51,39 @@ const columns: TableProps<JCZDataType>["columns"] = [
     dataIndex: "created",
     key: "created",
   },
+  {
+    title: "委办人姓名",
+    dataIndex: "wbrName",
+    key: "wbrName",
+  },
+  {
+    title: "先人信息",
+    dataIndex: "xrList",
+    key: "xrList",
+    render: (xrList) => {
+      return xrList.map((item: any) => item.xrName).join(",");
+    },
+  },
+  {
+    title: "缴费止日期",
+    dataIndex: "jfList",
+    key: "jfList",
+    render: (jfList) => {
+      return jfList[0]?.created;
+    },
+  },
 
+  {
+    title: "欠费年数",
+    dataIndex: "jfEndYear",
+    key: "jfEndYear",
+    render: (jfEndYear) => {
+      if (jfEndYear) {
+        return dayjs().year() - jfEndYear;
+      }
+      return "无上次缴费信息";
+    },
+  },
   {
     title: "操作",
     key: "action",

@@ -1,5 +1,6 @@
 "use client";
 import { Flex, Form, FormProps, Input, Table, TableProps, theme } from "antd";
+import TextArea from "antd/es/input/TextArea";
 import { useEffect } from "react";
 type FieldType = {
   wbrName?: string;
@@ -56,7 +57,6 @@ export default function Agent({
     <main>
       <Form
         name="agent"
-        labelCol={{ span: 10 }}
         wrapperCol={{ span: 16 }}
         initialValues={{ wbrName: wbrName }}
         onValuesChange={onValuesChange}
@@ -64,6 +64,7 @@ export default function Agent({
         autoComplete="off"
         layout="inline"
         form={form}
+        labelAlign="left"
       >
         <Form.Item<FieldType> label="姓名" name="wbrName">
           <Input
@@ -86,15 +87,23 @@ export default function Agent({
             variant={agentIsRevise ? "outlined" : "borderless"}
           />
         </Form.Item>
-        <Form.Item<FieldType> label="地址" name="address">
+        <Form.Item<FieldType>
+          label="地址"
+          name="address"
+          style={{ width: "100%" }}
+        >
           <Input
             placeholder="地址"
             disabled={!agentIsRevise}
             variant={agentIsRevise ? "outlined" : "borderless"}
           />
         </Form.Item>
-        <Form.Item<FieldType> label="委办人备注" name="wbrDesc">
-          <Input
+        <Form.Item<FieldType>
+          label="委办人备注"
+          name="wbrDesc"
+          style={{ width: "100%" }}
+        >
+          <TextArea
             placeholder="委办人备注"
             disabled={!agentIsRevise}
             variant={agentIsRevise ? "outlined" : "borderless"}

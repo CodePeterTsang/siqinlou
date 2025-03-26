@@ -21,7 +21,7 @@ import {
 import { getThemeBg } from "@/utils";
 // import { Link, pathnames, usePathname } from "../../navigation";
 import styles from "./index.module.less";
-import { getUser, removeToken } from "@/utils/auth";
+import { getUser, removeToken, removeUser } from "@/utils/auth";
 import { usePathname } from "next/navigation";
 import zhCN from "antd/es/locale/zh_CN";
 import { logoutApi } from "@/app/login/api";
@@ -66,6 +66,7 @@ const CommonLayout: React.FC<IProps> = ({
     try {
       await logoutApi(userNo);
       removeToken();
+      removeUser();
       router.push("./login");
     } catch (e) {}
   };
@@ -87,7 +88,7 @@ const CommonLayout: React.FC<IProps> = ({
       const user = JSON.parse(userData);
       setUserName(user.userName);
     }
-  }, []);
+  }, [pathname]);
 
   return (
     <ConfigProvider

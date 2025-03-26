@@ -16,8 +16,11 @@
 .agent-width {
   :global {
     .ant-form-item-row {
-      width: 250px;
+      // width: 100%;
       margin-bottom: 3px;
+    }
+    .ant-form-item-label {
+      // width: 75px;
     }
   }
 }
@@ -26,9 +29,12 @@
   font-family: "Hiragino Sans GB";
   color: black;
   width: 16cm;
-  height: 10cm;
+  height: 9.31cm;
   font-size: 14px;
   line-height: 20px;
+  .no-show {
+    color: red;
+  }
   .item-title {
     color: red;
     width: 2cm;
@@ -37,10 +43,22 @@
     display: flex;
     align-items: center;
     height: 1cm;
+    .room-no,
+    .ca-no,
+    .start-year,
+    .end-year {
+      width: 2.5cm;
+      display: inline-block;
+      text-align: center;
+    }
+    .ca-no {
+      width: 2cm;
+    }
   }
 
   .title {
     text-align: center;
+    color: red;
   }
   .time {
     margin-top: 1cm;
@@ -54,6 +72,10 @@
     .day-font {
       color: red;
     }
+  }
+  .item-one,
+  .item-two {
+    width: 3cm;
   }
   .money > div {
     width: 33%;
@@ -69,11 +91,18 @@
   .print-content {
     font-family: "Hiragino Sans GB";
     color: black;
-    width: 15cm;
-    height: 10cm;
+    width: 16cm;
+    height: 9.31cm;
     font-size: 14px;
     line-height: 20px;
-    padding: 1cm 0.5cm;
+    padding-left: 3cm;
+    .no-show {
+      opacity: 0;
+    }
+    .jin-e {
+      width: 1cm;
+    }
+
     .item-title {
       color: red;
       width: 2cm;
@@ -83,10 +112,22 @@
       display: flex;
       align-items: center;
       height: 1cm;
+      .room-no,
+      .start-year,
+      .end-year {
+        width: 2.5cm;
+        display: inline-block;
+        text-align: center;
+      }
+      .ca-no {
+        width: 2cm;
+      }
     }
 
     .title {
       text-align: center;
+      opacity: 0;
+      color: red;
     }
     .time {
       margin-top: 1cm;
@@ -101,6 +142,10 @@
         color: red;
         opacity: 0;
       }
+    }
+    .item-one,
+    .item-two {
+      width: 3cm;
     }
     .money > div {
       width: 33%;
