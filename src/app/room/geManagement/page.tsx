@@ -121,7 +121,7 @@ const App: React.FC = () => {
           <Card.Grid
             key={index}
             style={gridStyle[item.caType]}
-            className={checkSelected(item) ? styles["card-active"] : ""}
+            className={styles["card-active"]}
             onClick={() => {
               cardClick(item, index);
             }}

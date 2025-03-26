@@ -35,7 +35,7 @@ export default function RootLayout({
           <AntdGlobal></AntdGlobal>
           <AntdRegistry>
             <Suspense>
-              <Layout curActive="/">{children}</Layout>
+              <Layout>{children}</Layout>
             </Suspense>
           </AntdRegistry>
         </App>

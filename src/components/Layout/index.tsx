@@ -34,14 +34,12 @@ const { Header, Content, Footer, Sider } = Layout;
 
 interface IProps {
   children: React.ReactNode;
-  curActive: string;
   defaultOpen?: string[];
 }
 
 const CommonLayout: React.FC<IProps> = ({
   children,
-  curActive,
-  defaultOpen = ["/"],
+  defaultOpen = ["/depositCertificate/detail"],
 }) => {
   const {
     token: { borderRadiusLG, colorTextBase, colorWarningText },
@@ -52,6 +50,7 @@ const CommonLayout: React.FC<IProps> = ({
   const navList = getNavList();
 
   const [userName, setUserName] = useState("");
+  const [curActive, setCurActive] = useState("/");
   const handleSelect = (row: { key: string }) => {
     if (row.key.includes("http")) {
       window.open(row.key);
@@ -88,6 +87,7 @@ const CommonLayout: React.FC<IProps> = ({
       const user = JSON.parse(userData);
       setUserName(user.userName);
     }
+    setCurActive(pathname);
   }, [pathname]);
 
   return (
@@ -127,6 +127,7 @@ const CommonLayout: React.FC<IProps> = ({
                 mode="inline"
                 defaultSelectedKeys={[curActive]}
                 items={navList}
+                selectedKeys={[curActive]}
                 defaultOpenKeys={defaultOpen}
                 onSelect={handleSelect}
               />
