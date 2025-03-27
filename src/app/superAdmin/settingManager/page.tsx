@@ -13,19 +13,12 @@ import {
 } from "antd";
 import { maxYearApi, setFeeLimitApi } from "../api";
 import { message } from "antd";
-import dayjs from "dayjs";
 import { useEffect } from "react";
 export default function User() {
   const { token } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
 
-  const listStyle: React.CSSProperties = {
-    background: token.colorFillAlter,
-    borderRadius: token.borderRadiusLG,
-    padding: 12,
-  };
   const [form] = Form.useForm();
-  // const [expand, setExpand] = useState(false);
 
   const formStyle: React.CSSProperties = {
     maxWidth: "none",
@@ -37,9 +30,7 @@ export default function User() {
   const onFinish = async (values: any) => {
     console.log("Received values of form: ", values);
     try {
-      await setFeeLimitApi({
-        maxYear: parseInt(dayjs(values.field).format("YYYY")),
-      });
+      // await setFeeLimitApi();
     } catch (e) {
       console.log(e);
     }
@@ -48,7 +39,7 @@ export default function User() {
   useEffect(() => {
     async function getYear() {
       const { data } = await maxYearApi();
-      form.setFieldsValue({ year: dayjs().year(data) });
+      form.setFieldsValue({ year: data });
     }
     getYear();
   }, [form]);
@@ -67,15 +58,15 @@ export default function User() {
             <Col span={16} key={1}>
               <Form.Item
                 name="year"
-                label="设置缴费年限"
+                label="设置收款人"
                 rules={[
                   {
                     required: true,
-                    message: "请输入缴费年限",
+                    message: "请输入收款人",
                   },
                 ]}
               >
-                <DatePicker picker="year" minDate={dayjs()} />
+                <Input />
               </Form.Item>
             </Col>
           </Row>

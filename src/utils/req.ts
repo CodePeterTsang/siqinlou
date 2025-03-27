@@ -1,5 +1,6 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import { message } from "@/components/AntGlobal";
+import { getToken } from "./auth";
 
 declare module "axios" {
   interface AxiosResponse<T = any> {
@@ -10,10 +11,17 @@ declare module "axios" {
 const instance = axios.create({
   baseURL: process.env.BASE_API_URL,
   timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 instance.interceptors.request.use(
   function (config) {
+    const token = getToken();
+    if (token) {
+      config.headers["token"] = token;
+    }
     return config;
   },
   function (error) {

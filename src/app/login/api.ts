@@ -17,4 +17,4 @@ export const queryUserApi = (userNo: string) =>
   req.post("/api/user/query", { userNo });
 
 export const logoutApi = (userNo: string) =>
-  req.post("/api/user/logout", { userNo });
+  req.post("/api/user/logout", { userNo: userNo });

@@ -6,15 +6,17 @@ import { Button, Col, Form, Input, Row, Select, Space, theme } from "antd";
 import { useRoomList } from "@/utils/store/useConfigStore";
 import { JCZFilter } from "@/utils/types";
 import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 const AdvancedSearchForm = ({
   onFilter,
 }: {
-  onFilter: (values: JCZFilter) => void;
+  onFilter: (values: JCZFilter, initPageSize: boolean) => void;
 }) => {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
   const roomList = useRoomList();
+  const searchParams = useSearchParams();
 
   const searchLabels = [
     {
@@ -62,21 +64,6 @@ const AdvancedSearchForm = ({
       type: "input",
     },
     {
-      label: "缴费状态",
-      key: "caStatus",
-      placeholder: "请选择缴费状态",
-      options: [
-        {
-          value: 0,
-          label: "正常",
-        },
-        {
-          value: 1,
-          label: "欠费",
-        },
-      ],
-    },
-    {
       label: "注销状态",
       key: "status",
       placeholder: "请选择注销状态",
@@ -91,6 +78,21 @@ const AdvancedSearchForm = ({
         },
       ],
     },
+    {
+      label: "缴费状态",
+      key: "caStatus",
+      placeholder: "请选择缴费状态",
+      options: [
+        {
+          value: 0,
+          label: "正常",
+        },
+        {
+          value: 1,
+          label: "欠费",
+        },
+      ],
+    },
   ];
   const formStyle: React.CSSProperties = {
     maxWidth: "none",
@@ -99,15 +101,23 @@ const AdvancedSearchForm = ({
     padding: 24,
   };
   useEffect(() => {
-    onFilter({});
-  }, [onFilter]);
+    const filterValue = JSON.parse(searchParams.get("jczFilter") || "");
+    form.setFieldsValue(filterValue);
+    onFilter(filterValue, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // useEffect(() => {
+  //   onFilter({}, true);
+  // }, [onFilter]);
+
   return (
     <Form
       form={form}
       name="advanced_search"
       style={formStyle}
       onFinish={(value) => {
-        onFilter(value);
+        onFilter(value, true);
       }}
     >
       <Row gutter={24}>

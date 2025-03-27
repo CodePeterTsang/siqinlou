@@ -326,6 +326,10 @@ export default function DepositCertificateDetail() {
     [detailData]
   );
 
+  const scrollToEnd = () => {
+    window.scrollTo(0, document.body.scrollHeight);
+  };
+
   useEffect(() => {
     const url = `${searchParams}`;
     const param = getUrlParams(url);
@@ -417,8 +421,8 @@ export default function DepositCertificateDetail() {
                 disabled={addCertificate || !detailData.jczNo}
                 type="primary"
                 onClick={() => {
-                  // printFee();
                   handleAllStatus(setShowFeeDetail);
+                  scrollToEnd();
                 }}
               >
                 缴费

@@ -141,6 +141,7 @@ const CommonLayout: React.FC<IProps> = ({
                 <div className={styles.avatar}>
                   <Dropdown menu={{ items }} placement="bottomLeft" arrow>
                     <Avatar
+                      size="large"
                       style={{ color: "#fff", backgroundColor: "#1677ff" }}
                     >
                       {userName}

@@ -9,9 +9,13 @@ import { useCallback, useEffect, useState } from "react";
 import { JCZFilter, JXDataType } from "@/utils/types";
 import { jczApi } from "../api";
 import { useSetRoomList } from "@/utils/store/useConfigStore";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export default function User() {
   const { token } = theme.useToken();
+  const searchParams = useSearchParams();
+  const pathName = usePathname();
+  const { replace } = useRouter();
   const [listData, setListData] = useState(data);
   const [pageSize, setPageSize] = useState(5);
   const [pageNum, setPageNum] = useState(1);
@@ -19,7 +23,7 @@ export default function User() {
     []
   );
   const [total, setTotal] = useState(0);
-  const [jczFilter, setJCZFilter] = useState<JCZFilter>({ roomNo: "A101" });
+  const [jczFilter, setJCZFilter] = useState<JCZFilter>({});
   const setRoomList = useSetRoomList();
 
   const listStyle: React.CSSProperties = {
@@ -27,6 +31,14 @@ export default function User() {
     borderRadius: token.borderRadiusLG,
     padding: 12,
   };
+
+  const handleSearch = useCallback(() => {
+    const param = new URLSearchParams();
+    param.set("pageSize", pageSize.toString());
+    param.set("pageNum", pageNum.toString());
+    param.set("jczFilter", JSON.stringify(jczFilter));
+    replace(`${pathName}?${param.toString()}`);
+  }, [pageSize, pageNum, jczFilter]);
 
   const initJCZList = useCallback(async () => {
     const jczListQuery = {
@@ -39,6 +51,7 @@ export default function User() {
       setListData(data);
     }
     setTotal(total);
+    handleSearch();
   }, [pageNum, pageSize, jczFilter]);
 
   const onPaginationChange = useCallback((page: number, pageSize: number) => {
@@ -66,8 +79,17 @@ export default function User() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNum, pageSize, jczFilter]);
 
-  const onFilter = useCallback((value: JCZFilter) => {
+  useEffect(() => {
+    setPageNum(parseInt(searchParams.get("pageNum") || "1"));
+    setPageSize(parseInt(searchParams.get("pageSize") || "5"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onFilter = useCallback((value: JCZFilter, initPageSize: boolean) => {
     setJCZFilter(value);
+    if (initPageSize) {
+      setPageNum(1);
+    }
   }, []);
 
   return (

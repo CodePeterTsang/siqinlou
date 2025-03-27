@@ -18,6 +18,8 @@ import { data, UserListDataType } from "./column";
 import styles from "./index.module.less";
 import { useCallback, useEffect, useState } from "react";
 import { userCreateApi, userEditApi, userListApi } from "../api";
+import { logoutApi } from "@/app/login/api";
+import router from "next/router";
 type UserFieldType = {
   userNo?: string;
   userName?: string;
@@ -30,7 +32,9 @@ export default function User() {
   const [editForm] = Form.useForm();
   const [addForm] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-
+  const [pageSize, setPageSize] = useState(5);
+  const [pageNum, setPageNum] = useState(1);
+  const [total, setTotal] = useState(0);
   const [list, setList] = useState<UserListDataType[]>(data);
   const [isEdit, setIsEdit] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
@@ -84,6 +88,16 @@ export default function User() {
     setIsAdd(true);
   };
 
+  const onLogout = async (userNo: string) => {
+    try {
+      await logoutApi(userNo);
+      messageApi.success("解除登录成功");
+      initUserList();
+    } catch (e: any) {
+      messageApi.error(e.errorMessage);
+    }
+  };
+
   const columns: TableProps<UserListDataType>["columns"] = [
     {
       title: "用户ID",
@@ -107,22 +121,47 @@ export default function User() {
       render: (role) => (role === "admin" ? "超级管理员" : "操作员"),
     },
     {
+      title: "状态",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (status ? "离线中" : "登录中"),
+    },
+    {
       title: "操作",
       key: "action",
       render: (_, record) => (
-        <Space size="middle">
-          <a
-            onClick={() => {
-              setIsEdit(true);
-              setEditContent(record);
-            }}
-          >
-            编辑
-          </a>
-        </Space>
+        <div>
+          <Space size="middle">
+            <a
+              onClick={() => {
+                setIsEdit(true);
+                setEditContent(record);
+              }}
+            >
+              编辑
+            </a>
+            {!record.status ? (
+              <a
+                onClick={() => {
+                  onLogout(record.userNo);
+                }}
+              >
+                解除登录
+              </a>
+            ) : (
+              ""
+            )}
+          </Space>
+        </div>
       ),
     },
   ];
+
+  const onPaginationChange = useCallback((page: number, pageSize: number) => {
+    setPageNum(page);
+    setPageSize(pageSize);
+  }, []);
+
   useEffect(() => {
     initUserList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,7 +208,12 @@ export default function User() {
             rowKey="id"
             columns={columns}
             dataSource={list}
-            pagination={{ pageSize: 5 }}
+            pagination={{
+              pageSize: pageSize,
+              current: pageNum,
+              onChange: onPaginationChange,
+              total,
+            }}
             scroll={{ x: 500 }}
           />
         </div>

@@ -1,8 +1,16 @@
 "use client";
-import { Button, Form, Input, message, Segmented, type FormProps } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  message,
+  Segmented,
+  Space,
+  type FormProps,
+} from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginApi, registerApi } from "./api";
+import { loginApi, queryUserApi, registerApi } from "./api";
 import { setToken, setUser } from "@/utils/auth";
 
 import styles from "./index.module.less";
@@ -16,6 +24,7 @@ export default function Home() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
+  const [userName, setUserName] = useState("");
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values: any) => {
     const { userNo, password } = values;
@@ -40,6 +49,15 @@ export default function Home() {
     return;
   };
 
+  const getUserName = async (changedValues: any, values: FieldType) => {
+    try {
+      if (values.userNo) {
+        const { data } = await queryUserApi(values.userNo);
+        setUserName(data[0].userName);
+      }
+    } catch (e: any) {}
+  };
+
   return (
     <main className={styles.loginWrap}>
       {/* <div className={styles.leftBanner}>
@@ -58,6 +76,7 @@ export default function Home() {
             form={form}
             onFinish={onFinish}
             autoComplete="off"
+            onValuesChange={getUserName}
           >
             <>
               <Form.Item<FieldType>
@@ -74,9 +93,10 @@ export default function Home() {
                 ]}
               >
                 <Input
-                  placeholder="请输入用户名"
+                  placeholder="请输入用户编号"
                   size="large"
                   variant="filled"
+                  addonAfter={userName}
                 />
               </Form.Item>
 

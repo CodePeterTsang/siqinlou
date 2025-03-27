@@ -5,6 +5,7 @@ import {
   Form,
   FormProps,
   Input,
+  InputNumber,
   Row,
   Table,
   TableProps,
@@ -116,7 +117,12 @@ export default function FeeInfo({
               </Col>
               <Col className="gutter-row" span={12}>
                 <Form.Item<FieldType> label="缴费年数" name="yearCount">
-                  <Input placeholder="缴费年数" disabled={!showFeeDetail} />
+                  <InputNumber
+                    placeholder="缴费年数"
+                    disabled={!showFeeDetail}
+                    min={1}
+                    max={99}
+                  />
                 </Form.Item>
               </Col>
 

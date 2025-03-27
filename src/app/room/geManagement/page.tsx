@@ -8,6 +8,7 @@ import {
   Flex,
   Modal,
   message,
+  theme,
 } from "antd";
 import type { PaginationProps } from "antd";
 import zhCN from "antd/es/locale/zh_CN";
@@ -26,6 +27,7 @@ interface GridStyle {
 interface CardData {
   caNo: string | number;
   caType: "1" | "2" | "3";
+  caStatus: 0 | 1;
 }
 
 interface SelectedCard extends CardData {
@@ -62,7 +64,10 @@ const App: React.FC = () => {
   const [pageNum, setPageNum] = useState(1);
   const [total, setTotal] = useState(0);
   const [roomFilter, setRoomFilter] = useState<RoomFilter>({ roomNo: "A101" });
-
+  const { token } = theme.useToken();
+  const geStyle: React.CSSProperties = {
+    color: token.colorPrimary,
+  };
   useEffect(() => {
     setRoomList();
   }, [setRoomList]);
@@ -127,6 +132,7 @@ const App: React.FC = () => {
             }}
           >
             {item.caNo}号格
+            <span style={geStyle}>{item.caStatus ? "(存放)" : ""}</span>
           </Card.Grid>
         ))}
       </Card>
