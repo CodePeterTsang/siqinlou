@@ -26,11 +26,15 @@ import { usePathname } from "next/navigation";
 import zhCN from "antd/es/locale/zh_CN";
 import { logoutApi } from "@/app/login/api";
 import dynamic from "next/dynamic";
+import "dayjs/locale/zh-cn";
+import dayjs from "dayjs";
 const NoSSR = (props: any) => <React.Fragment>{props.children}</React.Fragment>;
 const DynamicSidebarWithNoSSR = dynamic(() => Promise.resolve(NoSSR), {
   ssr: false,
 });
 const { Header, Content, Footer, Sider } = Layout;
+
+dayjs.locale("zh-cn");
 
 interface IProps {
   children: React.ReactNode;

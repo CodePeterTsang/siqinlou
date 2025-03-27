@@ -11,7 +11,7 @@ import {
   Table,
   theme,
 } from "antd";
-import { maxYearApi, setFeeLimitApi } from "../api";
+import { editManagerApi, managerApi, maxYearApi, setFeeLimitApi } from "../api";
 import { message } from "antd";
 import { useEffect } from "react";
 export default function User() {
@@ -30,7 +30,7 @@ export default function User() {
   const onFinish = async (values: any) => {
     console.log("Received values of form: ", values);
     try {
-      // await setFeeLimitApi();
+      await editManagerApi({ manager: values.manager });
     } catch (e) {
       console.log(e);
     }
@@ -38,8 +38,8 @@ export default function User() {
 
   useEffect(() => {
     async function getYear() {
-      const { data } = await maxYearApi();
-      form.setFieldsValue({ year: data });
+      const { data } = await managerApi();
+      form.setFieldsValue({ manager: data });
     }
     getYear();
   }, [form]);
@@ -57,7 +57,7 @@ export default function User() {
           <Row gutter={24}>
             <Col span={16} key={1}>
               <Form.Item
-                name="year"
+                name="manager"
                 label="设置收款人"
                 rules={[
                   {

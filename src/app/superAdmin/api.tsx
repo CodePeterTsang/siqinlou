@@ -58,5 +58,32 @@ export const userCreateApi = (query: {
 /**
  * 查询寄存证最大年数查询
  */
-
 export const maxYearApi = () => req.post("/api/jcz/query/year");
+
+/**
+ * 通过时间去查询缴费记录
+ */
+export const incomeForTimeApi = (query: {
+  startTime: number;
+  endTime: number;
+}) => req.post("/api/jfd/count/month", query);
+
+/**
+ * 通过时间和操作员去查询缴费记录
+ */
+export const incomeForOperatorApi = (query: {
+  startTime: number;
+  endTime: number;
+  operator: string;
+}) => req.post("/api/jfd/count/day", query);
+
+/**
+ * 查询缴费经理
+ */
+export const managerApi = () => req.post("/api/jcz/query/manager");
+
+/**
+ * 设置缴费经理
+ */
+export const editManagerApi = (query: { manager: string }) =>
+  req.post("/api/jcz/edit/manager", query);

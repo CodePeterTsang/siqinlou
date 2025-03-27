@@ -38,6 +38,7 @@
   .item-title {
     color: red;
     width: 2cm;
+    display: inline-block;
   }
   .line {
     display: flex;
@@ -49,7 +50,6 @@
     .end-year {
       width: 2.5cm;
       display: inline-block;
-      text-align: center;
     }
     .ca-no {
       width: 2cm;
@@ -62,6 +62,8 @@
   }
   .time {
     margin-top: 1cm;
+    margin-bottom: 0.5cm;
+    margin-left: -2cm;
     text-align: center;
     span {
       width: 40px;
@@ -76,10 +78,20 @@
   .item-one,
   .item-two {
     width: 3cm;
+    line-height: 0.8cm;
   }
-  .money > div {
-    width: 33%;
+  .item-two-money,
+  .item-one-money {
+    display: inline-block;
+    line-height: 0.8cm;
+    width: 2cm;
   }
+  .money {
+    height: 2cm;
+  }
+  // .money > div {
+  //   width: 33%;
+  // }
   .charge-man {
     p {
       width: 30%;
@@ -91,11 +103,12 @@
   .print-content {
     font-family: "Hiragino Sans GB";
     color: black;
-    width: 16cm;
+    width: 19cm;
     height: 9.31cm;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 20px;
-    padding-left: 3cm;
+    padding-top: 1cm;
+    padding-left: 2.7cm;
     .no-show {
       opacity: 0;
     }
@@ -106,7 +119,9 @@
     .item-title {
       color: red;
       width: 2cm;
+      height: 1cm;
       opacity: 0;
+      display: inline-block;
     }
     .line {
       display: flex;
@@ -117,7 +132,6 @@
       .end-year {
         width: 2.5cm;
         display: inline-block;
-        text-align: center;
       }
       .ca-no {
         width: 2cm;
@@ -132,8 +146,9 @@
     .time {
       margin-top: 1cm;
       text-align: center;
+      margin-left: -4.2cm;
       span {
-        width: 40px;
+        width: 1cm;
         display: inline-block;
       }
       .year-font,
@@ -141,18 +156,33 @@
       .day-font {
         color: red;
         opacity: 0;
+        width: 0.5cm;
       }
     }
     .item-one,
     .item-two {
       width: 3cm;
+      height: 1cm;
     }
-    .money > div {
-      width: 33%;
+    .item-two-money,
+    .item-one-money {
+      display: inline-block;
+      line-height: 0.8cm;
+      width: 2cm;
     }
+
+    .money {
+      height: 2cm;
+    }
+    // .money > div {
+    //   width: 33%;
+    // }
     .charge-man {
       p {
         width: 30%;
+      }
+      .item-title {
+        width: 1.5cm;
       }
     }
   }

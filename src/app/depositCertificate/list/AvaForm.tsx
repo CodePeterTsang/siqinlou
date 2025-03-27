@@ -101,7 +101,12 @@ const AdvancedSearchForm = ({
     padding: 24,
   };
   useEffect(() => {
-    const filterValue = JSON.parse(searchParams.get("jczFilter") || "");
+    const jczFilterJson = searchParams.get("jczFilter");
+    let filterValue = {};
+
+    if (jczFilterJson) {
+      filterValue = JSON.parse(jczFilterJson);
+    }
     form.setFieldsValue(filterValue);
     onFilter(filterValue, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps

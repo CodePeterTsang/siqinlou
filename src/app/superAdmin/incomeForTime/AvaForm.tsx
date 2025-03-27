@@ -1,11 +1,13 @@
 "use client";
-import { Button, Col, Form, Input, Row, Space, theme } from "antd";
+import { Button, Col, Form, Input, Row, Space, theme, DatePicker } from "antd";
+import dayjs from "dayjs";
 
 import { useState } from "react";
 
-const searchLabels = ["用户名"];
+const searchLabels = ["时间范围"];
+const { RangePicker } = DatePicker;
 
-const AdvancedSearchForm = ({ cb }: { cb: (userNo: string) => void }) => {
+const AdvancedSearchForm = ({ cb }: { cb: (value: any[]) => void }) => {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
   // const [expand, setExpand] = useState(false);
@@ -31,7 +33,7 @@ const AdvancedSearchForm = ({ cb }: { cb: (userNo: string) => void }) => {
       <Row gutter={24}>
         <Col span={8} key={1}>
           <Form.Item name={`field`} label={searchLabels[0]}>
-            <Input placeholder="关键词搜索" />
+            <RangePicker picker="month" maxDate={dayjs()} />
           </Form.Item>
         </Col>
       </Row>

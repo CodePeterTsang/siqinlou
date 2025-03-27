@@ -17,7 +17,12 @@ import { data, IncomeForTimeDataType } from "./column";
 // import Layout from "@/components/Layout";
 import styles from "./index.module.less";
 import { useCallback, useEffect, useState } from "react";
-import { userCreateApi, userEditApi, userListApi } from "../api";
+import {
+  incomeForOperatorApi,
+  userCreateApi,
+  userEditApi,
+  userListApi,
+} from "../api";
 import { logoutApi } from "@/app/login/api";
 import router from "next/router";
 type UserFieldType = {
@@ -33,6 +38,7 @@ export default function User() {
   const [pageSize, setPageSize] = useState(5);
   const [pageNum, setPageNum] = useState(1);
   const [total, setTotal] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [list, setList] = useState<IncomeForTimeDataType[]>(data);
 
   const listStyle: React.CSSProperties = {
@@ -40,12 +46,19 @@ export default function User() {
     borderRadius: token.borderRadiusLG,
     padding: 12,
   };
-
-  const initUserList = useCallback(
-    async (value?: string) => {
+  const incomeForOperator = useCallback(
+    async (value: any[], operator: string) => {
+      console.log(value);
       try {
-        const { data } = await userListApi({ userNo: value });
-        setList(data);
+        if (value?.length === 2) {
+          const { data } = await incomeForOperatorApi({
+            startTime: value[0].valueOf(),
+            endTime: value[1].valueOf(),
+            operator,
+          });
+          setList(data.jfCounts);
+          setTotalCount(data.totalCount);
+        }
       } catch (e: any) {
         messageApi.error(e?.errorMessage);
       }
@@ -61,13 +74,13 @@ export default function User() {
     },
     {
       title: "时间",
-      dataIndex: "time",
-      key: "time",
+      dataIndex: "created",
+      key: "created",
     },
     {
       title: "收入",
-      dataIndex: "income",
-      key: "income",
+      dataIndex: "count",
+      key: "count",
     },
   ];
 
@@ -76,24 +89,19 @@ export default function User() {
     setPageSize(pageSize);
   }, []);
 
-  useEffect(() => {
-    initUserList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <main className={styles.userWrap}>
       {contextHolder}
       <div className={styles.content}>
-        {/* <AvaForm
-          cb={(value) => {
-            initUserList(value);
+        <AvaForm
+          cb={(timeRange: any[], operator: string) => {
+            incomeForOperator(timeRange, operator);
           }}
         />
-        <br /> */}
+        <br />
         <div style={listStyle}>
           <Table
-            rowKey="id"
+            rowKey="created"
             columns={columns}
             dataSource={list}
             pagination={{
@@ -105,15 +113,21 @@ export default function User() {
             scroll={{ x: 500 }}
             summary={(pageData) => {
               let totalIncome = 0;
-              pageData.forEach(({ time, income }) => {
-                totalIncome += income;
+              pageData.forEach(({ count }) => {
+                totalIncome += count;
               });
               return (
                 <>
                   <Table.Summary.Row>
-                    <Table.Summary.Cell index={0}>总共</Table.Summary.Cell>
+                    <Table.Summary.Cell index={0}>
+                      当前页面总共金额
+                    </Table.Summary.Cell>
                     <Table.Summary.Cell index={1} colSpan={2}>
                       {totalIncome}
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={0}>总共金额</Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} colSpan={2}>
+                      {totalCount}
                     </Table.Summary.Cell>
                   </Table.Summary.Row>
                 </>

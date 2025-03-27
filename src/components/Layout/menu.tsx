@@ -103,17 +103,17 @@ const getNavList = () => {
         {
           key: "/superAdmin/settingManager",
           icon: <FileMarkdownOutlined />,
-          label: "收款人设置(未完成",
+          label: "收款人设置",
         },
         {
           key: "/superAdmin/incomeForTime",
           icon: <FileMarkdownOutlined />,
-          label: "收入统计(未完成",
+          label: "收入统计",
         },
         {
           key: "/superAdmin/incomeForOperator",
           icon: <FileMarkdownOutlined />,
-          label: "个人统计(未完成",
+          label: "个人统计",
         },
       ],
     });

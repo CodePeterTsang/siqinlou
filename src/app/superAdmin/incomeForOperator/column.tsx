@@ -2,8 +2,8 @@ import { Space, type TableProps } from "antd";
 
 export interface IncomeForTimeDataType {
   key: string;
-  time: string;
-  income: number;
+  created: string;
+  count: number;
   operator: string;
 }
 
