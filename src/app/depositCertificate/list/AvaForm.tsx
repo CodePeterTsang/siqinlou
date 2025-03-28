@@ -18,7 +18,7 @@ const AdvancedSearchForm = ({
   const roomList = useRoomList();
   const searchParams = useSearchParams();
 
-  const searchLabels = [
+  const searchLabels: any[] = [
     {
       label: "室号",
       key: "roomNo",
@@ -80,15 +80,15 @@ const AdvancedSearchForm = ({
     },
     {
       label: "缴费状态",
-      key: "caStatus",
+      key: "jfStatus",
       placeholder: "请选择缴费状态",
       options: [
         {
-          value: 0,
+          value: true,
           label: "正常",
         },
         {
-          value: 1,
+          value: false,
           label: "欠费",
         },
       ],

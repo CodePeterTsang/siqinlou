@@ -45,6 +45,7 @@ import dayjs from "dayjs";
 import { getUser } from "@/utils/auth";
 import React from "react";
 import dynamic from "next/dynamic";
+import { managerApi } from "@/app/superAdmin/api";
 const NoSSR = (props: any) => <React.Fragment>{props.children}</React.Fragment>;
 const DynamicSidebarWithNoSSR = dynamic(() => Promise.resolve(NoSSR), {
   ssr: false,
@@ -71,6 +72,7 @@ export default function DepositCertificateDetail() {
   const [showFeeDetail, setShowFeeDetail] = useState<boolean>(false);
   const [feeCount, setFeeCount] = useState<number>(0);
   const [userData, setUserData] = useState({ userName: "", role: "admin" });
+  const [manager, setManager] = useState<string>("");
 
   // 修改证
   const [reviseCertificate, setReviseCertificate] = useState<boolean>(false);
@@ -83,6 +85,7 @@ export default function DepositCertificateDetail() {
 
   // 迁入盒
   const [insideBox, setInsideBox] = useState<boolean>(false);
+  const [askInsideDiscount, setAskInsideDiscount] = useState<boolean>(false);
   // 修改盒
   const [reviseBox, setReviseBox] = useState<boolean>(false);
   // 迁出盒
@@ -174,11 +177,51 @@ export default function DepositCertificateDetail() {
   // 修改盒
   const handleReviseBox = useCallback(
     async (xrList: XRDataType[]) => {
-      const { jczNo } = detailData;
+      if (addCertificate) {
+        setDetailData({ ...detailData, xrList: xrList });
+      } else {
+        const { jczNo } = detailData;
+        try {
+          await jczEdit({
+            jczNo,
+            xrList,
+          });
+        } catch (e) {
+          messageApi.open({
+            type: "error",
+            content: "修改先人信息失败",
+          });
+        }
+        getDepositCertificateDetail({
+          roomNo: detailData.roomNo || "",
+          caNo: detailData.caNo || "",
+        });
+      }
+    },
+    [detailData, getDepositCertificateDetail, messageApi]
+  );
+
+  const onInsideFinish = async () => {
+    const row = (await xlInsideForm.validateFields()) as XRDataType;
+    const { jczNo } = detailData;
+    const { created, xrName } = row;
+    const newXr = {
+      created: dayjs(created).format("YYYY-MM-DD"),
+      xrName,
+      id: dayjs().unix(),
+    };
+
+    if (addCertificate) {
+      const newXRList = detailData?.xrList
+        ? [...detailData?.xrList, newXr]
+        : [newXr];
+      setDetailData({ ...detailData, xrList: newXRList });
+    } else {
       try {
         await jczEdit({
           jczNo,
-          xrList,
+          xrList: [newXr],
+          isDiscount: hasDiscount ? 1 : 0,
         });
       } catch (e) {
         messageApi.open({
@@ -190,63 +233,48 @@ export default function DepositCertificateDetail() {
         roomNo: detailData.roomNo || "",
         caNo: detailData.caNo || "",
       });
-    },
-    [detailData, getDepositCertificateDetail, messageApi]
-  );
-
-  const onInsideFinish = async () => {
-    const row = (await xlInsideForm.validateFields()) as Partial<XRDataType>;
-    const { jczNo } = detailData;
-    const { created, xrName } = row;
-    const newXr = {
-      created: dayjs(created).format("YYYY-MM-DD"),
-      xrName,
-    };
-
-    try {
-      await jczEdit({
-        jczNo,
-        xrList: [newXr],
-      });
-    } catch (e) {
-      messageApi.open({
-        type: "error",
-        content: "修改先人信息失败",
-      });
     }
     setInsideBox(false);
-    getDepositCertificateDetail({
-      roomNo: detailData.roomNo || "",
-      caNo: detailData.caNo || "",
-    });
   };
 
   // 迁出盒
   const handleOutsideBox = async (isOutside: boolean) => {
     if (isOutside && detailData.jczNo) {
-      try {
-        await outsideBoxApi({
-          xrName: outsideBoxSelected,
-          jczNo: detailData.jczNo,
-        });
-        getDepositCertificateDetail({
-          roomNo: detailData.roomNo || "",
-          caNo: detailData.caNo || "",
-        });
-      } catch (e) {
-        messageApi.error("迁出失败");
+      if (addCertificate) {
+        const newXrList = detailData.xrList?.filter(
+          (item) => item.xrName !== outsideBoxSelected
+        );
+        setDetailData({ ...detailData, xrList: newXrList });
+      } else {
+        try {
+          await outsideBoxApi({
+            xrName: outsideBoxSelected,
+            jczNo: detailData.jczNo,
+          });
+          getDepositCertificateDetail({
+            roomNo: detailData.roomNo || "",
+            caNo: detailData.caNo || "",
+          });
+        } catch (e) {
+          messageApi.error("迁出失败");
+        }
       }
     }
     setOutsideBox(false);
   };
 
-  // 新增寄存证
+  // 新增寄存证or迁入盒
   const handleDiscount = useCallback(
-    (discount: boolean) => {
+    (discount: boolean, openType = "addCertificate") => {
       setHasDiscount(discount);
-      setAddCertificate(true);
-      handleNewJczNo();
       setAskDiscount(false);
+      if (openType === "addCertificate") {
+        setAddCertificate(true);
+        handleNewJczNo();
+      } else if (openType === "insideBox") {
+        setAskInsideDiscount(false);
+        setInsideBox(true);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [askDiscount]
@@ -254,25 +282,37 @@ export default function DepositCertificateDetail() {
 
   const handleAddCertificate = async (isAdd: boolean) => {
     if (isAdd) {
-      if (!detailData.roomNo || !detailData.caNo || !detailData.wbrName) {
-        messageApi.info("请填写室号、格号和委办人名称");
+      if (
+        !detailData.roomNo ||
+        !detailData.caNo ||
+        !detailData.wbrName ||
+        !detailData.xrList?.length
+      ) {
+        messageApi.info("请填写室号、格号、先人信息和委办人名称");
         return;
       }
+
       try {
-        await createJczApi({
+        const { data } = await createJczApi({
           ...detailData,
           operator: userData.userName,
           isDiscount: hasDiscount ? 1 : 0,
         });
-      } catch (e) {
-        messageApi.error("新增失败");
+        getDepositCertificateDetail({
+          roomNo: detailData.roomNo || "",
+          caNo: detailData.caNo || "",
+        });
+        setAddCertificate(false);
+        setDetailData(data);
+        handlePayButton();
+        messageApi.success("新增寄存证成功");
+      } catch (e: any) {
+        messageApi.error(e?.errorMessage);
       }
+    } else {
+      setAddCertificate(false);
+      setDetailData({ jczNo: "" });
     }
-    getDepositCertificateDetail({
-      roomNo: detailData.roomNo || "",
-      caNo: detailData.caNo || "",
-    });
-    setAddCertificate(false);
   };
   const handleNewJczNo = async () => {
     try {
@@ -283,32 +323,56 @@ export default function DepositCertificateDetail() {
     }
   };
 
-  const handlePay = async () => {
+  const handlePay = useCallback(async () => {
+    if (!feeCount) {
+      messageApi.error("请输入缴费年限");
+      return;
+    }
+    const { data } = await managerApi();
+
     try {
-      const startYear = detailData.jfEndYear ? detailData.jfEndYear : 0 + 1;
-      const endYear = parseInt(startYear as string) + feeCount;
+      const startYear = detailData.jfEndYear
+        ? detailData.jfEndYear + 1
+        : dayjs().year();
+      const endYear = parseInt(startYear as string) + feeCount - 1;
+      const xrLength = detailData.xrList?.length || 0;
+      const unit =
+        detailData.caType && detailData.caType > xrLength
+          ? detailData.caType
+          : xrLength;
+
       await jfdPayApi({
         jczNo: detailData.jczNo,
         startYear: `${startYear}`,
         endYear: `${endYear}`,
         operator: userData.userName,
         yearCount: `${feeCount}`,
-        money: `${
-          feeCount * (detailData.caType ? detailData.caType : 0) * 150
-        }`,
-        jfCount: `${detailData.caType}`,
+        money: `${feeCount * unit * 150}`,
+        jfCount: `${unit}`,
+        manager: data,
       });
       getDepositCertificateDetail({
         roomNo: detailData.roomNo || "",
         caNo: detailData.caNo || "",
       });
       setShowFee(true);
+      scrollToTop();
       messageApi.success("缴费成功");
+      setShowFeeDetail(false);
     } catch (e: any) {
       messageApi.error(e.errorMessage);
     }
-    setShowFeeDetail(false);
-  };
+  }, [
+    detailData.caNo,
+    detailData.caType,
+    detailData.jczNo,
+    detailData.jfEndYear,
+    detailData.roomNo,
+    feeCount,
+    getDepositCertificateDetail,
+    messageApi,
+    userData.userName,
+  ]);
 
   const handleAllStatus = useCallback(
     (openStatus: Dispatch<SetStateAction<boolean>>) => {
@@ -330,6 +394,17 @@ export default function DepositCertificateDetail() {
     window.scrollTo(0, document.body.scrollHeight);
   };
 
+  const scrollToTop = () => {
+    window.scrollTo(0, 0);
+  };
+
+  const handlePayButton = useCallback(() => {
+    if (detailData?.jczNo) {
+      handleAllStatus(setShowFeeDetail);
+      scrollToEnd();
+    }
+  }, [detailData?.jczNo, handleAllStatus]);
+
   useEffect(() => {
     const url = `${searchParams}`;
     const param = getUrlParams(url);
@@ -348,6 +423,26 @@ export default function DepositCertificateDetail() {
     }
   }, []);
 
+  useEffect(() => {
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "Enter" || e.code === "NumpadEnter") {
+        if (showFeeDetail && detailData?.jczNo) {
+          handlePay();
+        }
+        if (showFee && detailData?.jczNo) {
+          setShowFee(false);
+          printFee();
+        }
+      }
+    };
+
+    document.addEventListener("keyup", onKeyUp);
+
+    return () => {
+      document.removeEventListener("keyup", onKeyUp);
+    };
+  }, [detailData?.jczNo, handlePay, printFee, showFee, showFeeDetail]);
+
   return (
     <div className={styles["deposit-certificate-detail"]}>
       {contextHolder}
@@ -364,7 +459,11 @@ export default function DepositCertificateDetail() {
                 <Button
                   disabled={!detailData.jczNo}
                   onClick={() => {
-                    handleAllStatus(setInsideBox);
+                    if (addCertificate) {
+                      handleAllStatus(setInsideBox);
+                    } else {
+                      handleAllStatus(setAskInsideDiscount);
+                    }
                   }}
                 >
                   迁入盒
@@ -421,8 +520,7 @@ export default function DepositCertificateDetail() {
                 disabled={addCertificate || !detailData.jczNo}
                 type="primary"
                 onClick={() => {
-                  handleAllStatus(setShowFeeDetail);
-                  scrollToEnd();
+                  handlePayButton();
                 }}
               >
                 缴费
@@ -542,6 +640,7 @@ export default function DepositCertificateDetail() {
             outsideSelected={(selected) => {
               setOutsideBoxSelected(selected.xrName);
             }}
+            isNewJcz={addCertificate}
           />
         </Card>
         <Flex
@@ -562,8 +661,7 @@ export default function DepositCertificateDetail() {
             <Position
               cb={getDepositCertificateDetail}
               print={() => {
-                // printFee();
-                handleAllStatus(setShowFeeDetail);
+                handlePayButton();
               }}
               caType={detailData?.caType}
               isNewJcz={addCertificate}
@@ -657,6 +755,7 @@ export default function DepositCertificateDetail() {
             list={detailData?.jfList}
             feeCount={feeCount}
             caType={detailData.caType}
+            xrLength={detailData?.xrList?.length}
           />
         </Card>
         <Card
@@ -701,6 +800,7 @@ export default function DepositCertificateDetail() {
             feeInfoCb={(value) => {
               setFeeCount(value);
             }}
+            xrLength={detailData?.xrList?.length}
           />
         </Card>
       </Flex>
@@ -752,12 +852,31 @@ export default function DepositCertificateDetail() {
       </Modal>
       <Modal
         title="新增证"
+        okText="是"
+        cancelText="否"
         open={askDiscount}
         onOk={() => {
           handleDiscount(true);
         }}
         onCancel={() => {
           handleDiscount(false);
+        }}
+      >
+        <p>请确认是否符合办理优惠寄存条件？</p>
+        <p>符合按“是”</p>
+        <p>不符合按“否”</p>
+        <p>如有疑问，请联系管理员</p>
+      </Modal>
+      <Modal
+        title="迁入盒"
+        okText="是"
+        cancelText="否"
+        open={askInsideDiscount}
+        onOk={() => {
+          handleDiscount(true, "insideBox");
+        }}
+        onCancel={() => {
+          handleDiscount(false, "insideBox");
         }}
       >
         <p>请确认是否符合办理优惠寄存条件？</p>

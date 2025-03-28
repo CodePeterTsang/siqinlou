@@ -124,33 +124,33 @@ export default function DeadInfo({
       editable: true,
     },
 
-    {
-      title: "操作",
-      dataIndex: "operation",
-      render: (_: any, record: XRDataType) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Typography.Link
-              onClick={() => save(record.id)}
-              style={{ marginInlineEnd: 8 }}
-            >
-              保存
-            </Typography.Link>
-            <Popconfirm title="确定取消吗?" onConfirm={cancel}>
-              <a>取消</a>
-            </Popconfirm>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== 0}
-            onClick={() => edit(record)}
-          >
-            编辑
-          </Typography.Link>
-        );
-      },
-    },
+    // {
+    //   title: "操作",
+    //   dataIndex: "operation",
+    //   render: (_: any, record: XRDataType) => {
+    //     const editable = isEditing(record);
+    //     return editable ? (
+    //       <span>
+    //         <Typography.Link
+    //           onClick={() => save(record.id)}
+    //           style={{ marginInlineEnd: 8 }}
+    //         >
+    //           保存
+    //         </Typography.Link>
+    //         <Popconfirm title="确定取消吗?" onConfirm={cancel}>
+    //           <a>取消</a>
+    //         </Popconfirm>
+    //       </span>
+    //     ) : (
+    //       <Typography.Link
+    //         disabled={editingKey !== 0}
+    //         onClick={() => edit(record)}
+    //       >
+    //         编辑
+    //       </Typography.Link>
+    //     );
+    //   },
+    // },
   ];
 
   const mergedColumns: TableProps<XRDataType>["columns"] = columns.map(

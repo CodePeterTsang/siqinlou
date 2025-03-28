@@ -10,12 +10,14 @@ export default function FeeDetail({
   startYear,
   feeCount,
   caType = 1,
+  xrLength = 1,
 }: {
   list: JXDataType[] | undefined;
   showFeeDetail: boolean;
   startYear: string | undefined;
   feeCount: number | undefined;
   caType: 1 | 2 | 3 | 4 | undefined;
+  xrLength: number | undefined;
 }) {
   const { token } = theme.useToken();
   const [data, setData] = useState<JfDataType[] | undefined>([]);
@@ -30,7 +32,6 @@ export default function FeeDetail({
       title: "年份",
       dataIndex: "startYear",
       key: "startYear",
-      render: (startYear, record) => `${startYear}-${record.endYear}`,
     },
     {
       title: "份数",
@@ -45,22 +46,24 @@ export default function FeeDetail({
   ];
 
   useEffect(() => {
-    if (showFeeDetail && startYear) {
+    const beginYear = (startYear && parseInt(startYear) + 1) || dayjs().year();
+    if (showFeeDetail) {
       let calCount = 0;
       if (!feeCount) {
-        calCount = dayjs().year() - (parseInt(startYear) + 1);
+        calCount = dayjs().year() - beginYear;
       }
       try {
-        const startYearCount = parseInt(startYear) + 1;
+        const startYearCount = beginYear;
         const yearList = [];
         let count = 0;
+        const unit = caType > xrLength ? caType : xrLength;
+
         while (count < (feeCount ? feeCount : calCount)) {
           yearList.push({
             id: count,
-            money: 150 * caType,
+            money: 150 * unit,
             startYear: startYearCount + count,
-            endYear: startYearCount + count + 1,
-            jfCount: caType,
+            jfCount: unit,
           });
           count++;
         }

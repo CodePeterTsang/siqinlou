@@ -25,7 +25,7 @@ export default function FeeInfo({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [detailData?.jczNo]);
+  }, [detailData?.jczNo, detailData?.jfList?.length]);
 
   const items: DescriptionsProps["items"] = [
     {
@@ -55,7 +55,11 @@ export default function FeeInfo({
     {
       key: "5",
       label: "缴费周期",
-      children: "empty",
+      children: (
+        <div>
+          {data?.startYear}-{data?.endYear}
+        </div>
+      ),
     },
     {
       key: "6",

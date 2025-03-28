@@ -1,6 +1,6 @@
 "use client";
 import { Card, theme } from "antd";
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import styles from "./../index.module.less";
 import classNames from "classnames";
 import { JCZDataType, JXDataType } from "@/utils/types";
@@ -15,12 +15,16 @@ export default forwardRef(function PrintContent(
     props.data?.jfList ? props.data?.jfList[0] : undefined
   );
 
+  useEffect(() => {
+    setJxData(props.data?.jfList ? props.data?.jfList[0] : undefined);
+  }, [props.data]);
+
   return (
     <Card>
       <div ref={ref} className={styles["print-content"]}>
         <div className={styles.title}>海珠区瑞宝街石溪经济联合社收款收据</div>
         <div className={styles.time}>
-          <span className={styles.year}>{jxData?.startYear}</span>
+          <span className={styles.year}> {dayjs(jxData?.created).year()}</span>
           <span className={styles["year-font"]}>年</span>
           <span className={styles.month}>
             {dayjs(jxData?.created).month() + 1}
@@ -127,7 +131,7 @@ export default forwardRef(function PrintContent(
           </p>
           <p>
             <span className={styles["item-title"]}>收款人：</span>
-            <span>梁志伟</span>
+            <span>{jxData?.manager}</span>
           </p>
           <p>
             <span className={styles["item-title"]}>收款单位盖章：</span>

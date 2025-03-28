@@ -38,10 +38,12 @@ export default function User() {
     console.log("Received values of form: ", values);
     try {
       await setFeeLimitApi({
-        maxYear: parseInt(dayjs(values.field).format("YYYY")),
+        maxYear: values.year.year(),
       });
+      messageApi.success("缴费年限设置成功");
     } catch (e) {
       console.log(e);
+      messageApi.error("缴费年限设置失败");
     }
   };
 

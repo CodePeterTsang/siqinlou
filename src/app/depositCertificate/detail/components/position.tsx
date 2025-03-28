@@ -79,7 +79,6 @@ export default function Position({
   useEffect(() => {
     async function fetchData() {
       await setRoomList();
-
       if (roomNo && caNo) {
         await setGeList(roomNo, isNewJcz ? 0 : 1);
 
@@ -96,19 +95,22 @@ export default function Position({
         });
       }
     }
+
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setRoomList, roomNo, caNo]);
+  }, [setRoomList, roomNo, caNo, isNewJcz]);
 
   useEffect(() => {
     form.setFieldValue("caType", caType ? caTypeMap[caType] : "");
-  }, [caType, form]);
+  }, [caType]);
 
   useEffect(() => {
     if (isNewJcz) {
       form.setFieldsValue({ roomNo: "", caNo: "" });
+    } else {
+      setGeList(form.getFieldValue("roomNo"), isNewJcz ? 0 : 1);
     }
-  }, [form, isNewJcz]);
+  }, [isNewJcz]);
 
   return (
     <main style={{ height: "100%" }}>
@@ -144,7 +146,7 @@ export default function Position({
             onChange={onGeChange}
             onKeyUp={(e) => {
               if (e.code === "Enter" || e.code === "NumpadEnter") {
-                if (!isNewJcz) {
+                if (!isNewJcz && form.getFieldValue("caNo")) {
                   print();
                 }
               }

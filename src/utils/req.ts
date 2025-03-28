@@ -42,9 +42,18 @@ instance.interceptors.response.use(
         case 401:
           // 客户端环境
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          window && (location.href = "/user/login");
+          window && (location.href = "/login");
+          break;
         case 500:
           message.error(error.response.data.msg || "请求失败");
+          break;
+        case 400:
+          if (error.response.data.errorCode === 10024) {
+            message.error("登录过期，请重新登录");
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            window && (location.href = "/login");
+          }
+          break;
       }
     }
     return Promise.reject(error.response.data);

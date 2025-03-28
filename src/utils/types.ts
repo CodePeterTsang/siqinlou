@@ -43,7 +43,7 @@ export type JCZFilter = {
   roomNo?: string;
   xrName?: string;
   wbrName?: string;
-  jfStatus?: number;
+  jfStatus?: boolean;
 };
 
 export interface XRDataType {
@@ -71,6 +71,7 @@ export interface JCZDataType {
   xrList?: XRDataType[];
   jfList?: JXDataType[];
   operator?: string;
+  manager?: string;
 }
 
 export const caTypeMap = {
@@ -92,6 +93,7 @@ export interface JXDataType {
   jcMoney?: string;
   jfDesc?: string;
   yearCount?: string;
+  manager?: string;
 }
 
 export interface JfDataType {

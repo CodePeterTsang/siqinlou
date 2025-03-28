@@ -66,7 +66,7 @@ export default function DepositCertificateDetail() {
       caNo: detailData.caNo || "",
     });
   }, [
-    detailData.caNo,
+    detailData?.caNo,
     detailData?.jczNo,
     detailData.roomNo,
     getDepositCertificateDetail,
@@ -190,7 +190,7 @@ export default function DepositCertificateDetail() {
           marginBottom: "5px",
         }}
       >
-        <Note jczDesc={detailData?.jczDesc} noteDisabled={false} />
+        <Note jczDesc={detailData?.jczDesc} noteDisabled={true} />
       </Card>
 
       <Card

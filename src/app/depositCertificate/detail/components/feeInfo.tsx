@@ -33,13 +33,15 @@ type FieldType = {
 export default function FeeInfo({
   startYear,
   showFeeDetail,
-  caType,
+  caType = 1,
   feeInfoCb,
+  xrLength = 1,
 }: {
   startYear: string | undefined;
   showFeeDetail: boolean;
   caType: 1 | 2 | 3 | 4 | undefined;
   feeInfoCb: (value: number) => void;
+  xrLength: number | undefined;
 }) {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
@@ -59,29 +61,36 @@ export default function FeeInfo({
     values,
     allValues
   ) => {
-    if (startYear) {
-      const yearRange = parseInt(startYear) + 1 + parseInt(values.yearCount);
-      form.setFieldsValue({
-        yearRange: `${parseInt(startYear) + 1}-${yearRange ? yearRange : 0}`,
-        yearCount: values.yearCount,
-        jfTotal: values.yearCount * (caType ? caType : 1) * 150,
-        jfType: "寄存证年费",
-        jfCount: caType,
-      });
-      feeInfoCb(parseInt(values.yearCount));
-    }
+    const beginYear = startYear ? parseInt(startYear) + 1 : dayjs().year();
+    const yearRange = beginYear + parseInt(values.yearCount) - 1;
+    const unit = caType > xrLength ? caType : xrLength;
+    form.setFieldsValue({
+      yearRange: `${beginYear}-${yearRange}`,
+      jfTotal: values.yearCount * unit * 150,
+      jfType: "寄存证年费",
+      jfCount: unit,
+    });
+    feeInfoCb(parseInt(values.yearCount));
   };
 
   useEffect(() => {
-    if (startYear && showFeeDetail) {
-      const range = dayjs().year() - (parseInt(startYear) + 1);
+    const beginYear = startYear ? parseInt(startYear) + 1 : dayjs().year();
+
+    if (showFeeDetail) {
+      const unit = caType > xrLength ? caType : xrLength;
+
+      let range = 1;
+      if (beginYear <= dayjs().year()) {
+        range = startYear ? dayjs().year() - beginYear : 4;
+      }
       form.setFieldsValue({
-        yearRange: `${parseInt(startYear) + 1}-${dayjs().year()}`,
-        yearCount: range,
-        jfTotal: range * (caType ? caType : 1) * 150,
+        yearRange: `${beginYear}-${beginYear + range}`,
+        yearCount: range + 1,
+        jfTotal: (range + 1) * unit * 150,
         jfType: "寄存证年费",
-        jfCount: caType,
+        jfCount: unit,
       });
+      feeInfoCb(range + 1);
     } else {
       form.setFieldsValue({
         yearRange: undefined,
@@ -91,7 +100,8 @@ export default function FeeInfo({
         jfCount: undefined,
       });
     }
-  }, [showFeeDetail, startYear, caType, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showFeeDetail, startYear, caType, xrLength]);
 
   return (
     <main>

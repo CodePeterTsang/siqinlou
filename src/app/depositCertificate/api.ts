@@ -28,7 +28,7 @@ interface JczQuery {
   caStatus?: number;
   xrName?: string;
   wbrName?: string;
-  jfStatus?: number;
+  jfStatus?: boolean;
   isFuzzy?: boolean;
 }
 
@@ -61,6 +61,7 @@ interface JfPay {
   money: string;
   jfCount: string;
   jczNo: string;
+  manager: string;
 }
 export const sgMergeApi = (type: number, sgList: Sg[]) =>
   req.post("/api/sg/merge", { type, sgList });

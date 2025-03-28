@@ -78,10 +78,11 @@ const columns: TableProps<JCZDataType>["columns"] = [
     dataIndex: "jfEndYear",
     key: "jfEndYear",
     render: (jfEndYear) => {
-      if (jfEndYear) {
+      if (jfEndYear && jfEndYear < dayjs().year()) {
         return dayjs().year() - jfEndYear;
+      } else {
+        return 0;
       }
-      return "无上次缴费信息";
     },
   },
   {

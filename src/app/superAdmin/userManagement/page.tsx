@@ -61,6 +61,11 @@ export default function User() {
 
   const editUser = useCallback(async () => {
     try {
+      await editForm.validateFields();
+    } catch (e) {
+      return;
+    }
+    try {
       await userEditApi({
         ...editForm.getFieldsValue(),
         userNo: editContent?.userNo,
@@ -72,6 +77,11 @@ export default function User() {
   }, [editContent?.userNo, editForm, messageApi]);
 
   const addUser = useCallback(async () => {
+    try {
+      await addForm.validateFields();
+    } catch (e) {
+      return;
+    }
     try {
       await userCreateApi({
         ...addForm.getFieldsValue(),
@@ -124,7 +134,7 @@ export default function User() {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      render: (status) => (status ? "离线中" : "登录中"),
+      render: (status) => (!status ? "离线中" : "登录中"),
     },
     {
       title: "操作",
@@ -140,7 +150,7 @@ export default function User() {
             >
               编辑
             </a>
-            {!record.status ? (
+            {record.status ? (
               <a
                 onClick={() => {
                   onLogout(record.userNo);
@@ -250,11 +260,7 @@ export default function User() {
             <Input.Password />
           </Form.Item>
 
-          <Form.Item<UserFieldType>
-            label="新密码"
-            name="newPassword"
-            rules={[{ required: true, message: "请输入新密码!" }]}
-          >
+          <Form.Item<UserFieldType> label="新密码" name="newPassword">
             <Input.Password />
           </Form.Item>
           <Form.Item<UserFieldType>

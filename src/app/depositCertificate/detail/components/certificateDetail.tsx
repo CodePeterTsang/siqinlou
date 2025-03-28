@@ -38,7 +38,7 @@ export default function CertificateDetail({
       jfStatus: jfStatus === undefined ? "" : jfStatus ? "正常" : "欠费",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jczNo]);
+  }, [jczNo, jfEndYear]);
 
   return (
     <main>

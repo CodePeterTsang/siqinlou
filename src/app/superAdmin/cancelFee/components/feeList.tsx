@@ -36,6 +36,11 @@ export default function FeeDetail({
       key: "yearCount",
     },
     {
+      title: "缴费日期",
+      dataIndex: "created",
+      key: "created",
+    },
+    {
       title: "缴费金额",
       dataIndex: "money",
       key: "money",
