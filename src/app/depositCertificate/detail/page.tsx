@@ -106,18 +106,22 @@ export default function DepositCertificateDetail() {
     async ({ roomNo, caNo }: { roomNo: string; caNo: string }) => {
       if (addCertificate) {
         setDetailData({ ...detailData, roomNo, caNo });
-      } else {
-        const query = {
-          isFuzzy: false,
-          roomNo,
-          caNo,
-        };
-        const { data } = await jczApi(query);
-        if (data.length) {
-          setDetailData(data[0]);
-        } else {
-          setDetailData({ roomNo, caNo, jczNo: "" });
+      } else if (roomNo && caNo) {
+        {
+          const query = {
+            isFuzzy: false,
+            roomNo,
+            caNo,
+          };
+          const { data } = await jczApi(query);
+          if (data.length) {
+            setDetailData(data[0]);
+          } else {
+            setDetailData({ roomNo, caNo, jczNo: "" });
+          }
         }
+      } else {
+        setDetailData({ roomNo, caNo, jczNo: "" });
       }
     },
     [addCertificate, detailData]
@@ -322,7 +326,8 @@ export default function DepositCertificateDetail() {
       const { data } = await createJczNo();
       setDetailData({ jczNo: data, created: dayjs().format("YYYY-MM-DD") });
     } catch (e: any) {
-      messageApi.error(e.errorMessage);
+      setAddCertificate(false);
+      messageApi.error("创建寄存证失败，请重试");
     }
   };
 

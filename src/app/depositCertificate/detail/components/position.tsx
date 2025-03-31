@@ -59,9 +59,17 @@ export default function Position({
 
   const onRoomChange = (value: string) => {
     setGeList(value, isNewJcz ? 0 : 1);
+    form.setFieldsValue({ caNo: "" });
+
     setDetailQuery({
       ...detailQuery,
       roomNo: value,
+      caNo: "",
+    });
+    cb({
+      ...detailQuery,
+      roomNo: value,
+      caNo: "",
     });
   };
 

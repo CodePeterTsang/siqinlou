@@ -27,9 +27,13 @@ const useConfigStore = create<State & Action>((set, get) => ({
   // user: { userNo: "", role: "", userName: "" },
   setGeList: async (roomNo?: string, caStatus?: number) => {
     if (get().roomList.length) {
+      set(() => ({
+        geList: [],
+      }));
       const { data } = await sgListApi({
         roomNo,
         caStatus,
+        pageSize: 1250,
       });
       set(() => ({
         geList: data.map((ca: Ca) => ({

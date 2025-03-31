@@ -14,7 +14,7 @@ import {
   Select,
   RefSelectProps,
 } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { caTypeMap } from "@/utils/types";
 type FieldType = {
   roomNo?: string;
@@ -51,13 +51,19 @@ export default function Position({
     console.log("Failed:", errorInfo);
   };
 
-  const onRoomChange = (value: string) => {
-    setGeList(value, isNewJcz ? 0 : 1);
-    setDetailQuery({
-      ...detailQuery,
-      roomNo: value,
-    });
-  };
+  const onRoomChange = useCallback(
+    (value: string) => {
+      setGeList(value, isNewJcz ? 0 : 1);
+      form.setFieldsValue({ caNo: "" });
+
+      setDetailQuery({
+        ...detailQuery,
+        roomNo: value,
+        caNo: "",
+      });
+    },
+    [detailQuery, form, isNewJcz, setGeList]
+  );
 
   const onGeChange = (value: string) => {
     setDetailQuery({
