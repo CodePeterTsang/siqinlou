@@ -127,7 +127,7 @@ export default forwardRef(function PrintContent(
         <div className={classNames(styles["charge-man"], styles.line)}>
           <p>
             <span className={styles["item-title"]}> 开票人：</span>
-            <span>{props.data?.operator}</span>
+            <span>{jxData?.operator}</span>
           </p>
           <p>
             <span className={styles["item-title"]}>收款人：</span>

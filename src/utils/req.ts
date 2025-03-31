@@ -46,12 +46,16 @@ instance.interceptors.response.use(
           break;
         case 500:
           message.error(error.response.data.msg || "请求失败");
-          break;
+          return;
+
         case 400:
           if (error.response.data.errorCode === 10024) {
             message.error("登录过期，请重新登录");
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            window && (location.href = "/login");
+            setTimeout(() => {
+              // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+              window && (location.href = "/login");
+            }, 500);
+            return;
           }
           break;
       }

@@ -6,7 +6,7 @@ export interface UserListDataType {
   userNo: string;
   role: string;
   password: string;
-  status: string;
+  status: number;
 }
 
 const data: UserListDataType[] = [];

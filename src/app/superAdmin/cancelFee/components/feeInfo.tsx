@@ -25,7 +25,7 @@ export default function FeeInfo({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [detailData?.jczNo, detailData?.jfList?.length]);
+  }, [detailData?.jczNo, detailData?.jfList?.length, detailData?.jfEndYear]);
 
   const items: DescriptionsProps["items"] = [
     {

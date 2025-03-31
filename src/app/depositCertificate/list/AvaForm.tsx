@@ -1,11 +1,22 @@
 "use client";
-import { Button, Col, Form, Input, Row, Select, Space, theme } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  FormProps,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Space,
+  theme,
+} from "antd";
 // import { useState } from "react";
 // import { DownOutlined } from "@ant-design/icons";
 
 import { useRoomList } from "@/utils/store/useConfigStore";
 import { JCZFilter } from "@/utils/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 const AdvancedSearchForm = ({
@@ -17,6 +28,8 @@ const AdvancedSearchForm = ({
   const [form] = Form.useForm();
   const roomList = useRoomList();
   const searchParams = useSearchParams();
+
+  const [showQfSearch, setShowQfSearch] = useState<boolean>(false);
 
   const searchLabels: any[] = [
     {
@@ -94,12 +107,41 @@ const AdvancedSearchForm = ({
       ],
     },
   ];
+  const qFSearchLabels: any[] = [
+    {
+      label: "欠费类型",
+      key: "qfType",
+      options: [
+        { value: ">=", label: ">=" },
+        { value: ">", label: ">" },
+        { value: "=", label: "=" },
+        { value: "<=", label: "<=" },
+        { value: "<", label: "<" },
+      ],
+      placeholder: "请选择格类型",
+    },
+    {
+      label: "欠费年数",
+      key: "qfYear",
+      placeholder: "请输入年数",
+      type: "input",
+    },
+  ];
   const formStyle: React.CSSProperties = {
     maxWidth: "none",
     background: token.colorFillAlter,
     borderRadius: token.borderRadiusLG,
     padding: 24,
   };
+
+  const onValuesChange: FormProps<JCZFilter>["onValuesChange"] = (
+    values,
+    allValues
+  ) => {
+    const { jfStatus } = allValues;
+    setShowQfSearch(!jfStatus);
+  };
+
   useEffect(() => {
     const jczFilterJson = searchParams.get("jczFilter");
     let filterValue = {};
@@ -108,6 +150,8 @@ const AdvancedSearchForm = ({
       filterValue = JSON.parse(jczFilterJson);
     }
     form.setFieldsValue(filterValue);
+    setShowQfSearch(!form.getFieldValue("jfStatus"));
+
     onFilter(filterValue, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -124,10 +168,10 @@ const AdvancedSearchForm = ({
       onFinish={(value) => {
         onFilter(value, true);
       }}
+      onValuesChange={onValuesChange}
     >
       <Row gutter={24}>
         {searchLabels.map((item, index) => (
-          // <div key={index}>{item}</div>
           <Col span={8} key={index}>
             <Form.Item
               name={searchLabels[index].key}
@@ -146,6 +190,31 @@ const AdvancedSearchForm = ({
             </Form.Item>
           </Col>
         ))}
+        {showQfSearch
+          ? qFSearchLabels.map((item, index) => (
+              <Col span={8} key={index}>
+                <Form.Item
+                  name={qFSearchLabels[index].key}
+                  label={qFSearchLabels[index].label}
+                >
+                  {qFSearchLabels[index].type === "input" ? (
+                    <InputNumber
+                      placeholder={qFSearchLabels[index].placeholder}
+                      min={1}
+                      max={99}
+                    />
+                  ) : (
+                    <Select
+                      showSearch
+                      placeholder={qFSearchLabels[index].placeholder}
+                      optionFilterProp="label"
+                      options={qFSearchLabels[index].options}
+                    ></Select>
+                  )}
+                </Form.Item>
+              </Col>
+            ))
+          : ""}
       </Row>
       <div style={{ textAlign: "right" }}>
         <Space size="small">

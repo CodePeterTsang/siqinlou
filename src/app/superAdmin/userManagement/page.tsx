@@ -17,7 +17,7 @@ import { data, UserListDataType } from "./column";
 // import Layout from "@/components/Layout";
 import styles from "./index.module.less";
 import { useCallback, useEffect, useState } from "react";
-import { userCreateApi, userEditApi, userListApi } from "../api";
+import { banUserApi, userCreateApi, userEditApi, userListApi } from "../api";
 import { logoutApi } from "@/app/login/api";
 import router from "next/router";
 type UserFieldType = {
@@ -107,6 +107,15 @@ export default function User() {
       messageApi.error(e.errorMessage);
     }
   };
+  const banUser = async (userNo: string, isBand: boolean) => {
+    try {
+      await banUserApi({ userNo, isBand });
+      messageApi.success(isBand ? "已禁用" : "已启用");
+      initUserList();
+    } catch (e: any) {
+      messageApi.error(e.errorMessage);
+    }
+  };
 
   const columns: TableProps<UserListDataType>["columns"] = [
     {
@@ -134,7 +143,19 @@ export default function User() {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      render: (status) => (!status ? "离线中" : "登录中"),
+      render: (status, record) => {
+        if (record.userNo === "admin") {
+          return "";
+        }
+        switch (status) {
+          case 0:
+            return <>离线中</>;
+          case 1:
+            return <>在线中</>;
+          case 2:
+            return <>禁用</>;
+        }
+      },
     },
     {
       title: "操作",
@@ -150,14 +171,33 @@ export default function User() {
             >
               编辑
             </a>
-            {record.status ? (
-              <a
-                onClick={() => {
-                  onLogout(record.userNo);
-                }}
-              >
-                解除登录
-              </a>
+
+            {record.userNo !== "admin" ? (
+              record.status === 2 ? (
+                <a
+                  onClick={() => {
+                    banUser(record.userNo, false);
+                  }}
+                >
+                  启用
+                </a>
+              ) : record.status === 1 ? (
+                <a
+                  onClick={() => {
+                    onLogout(record.userNo);
+                  }}
+                >
+                  解除登录
+                </a>
+              ) : (
+                <a
+                  onClick={() => {
+                    banUser(record.userNo, true);
+                  }}
+                >
+                  禁用
+                </a>
+              )
             ) : (
               ""
             )}

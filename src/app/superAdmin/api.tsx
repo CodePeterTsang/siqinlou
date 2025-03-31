@@ -87,3 +87,9 @@ export const managerApi = () => req.post("/api/jcz/query/manager");
  */
 export const editManagerApi = (query: { manager: string }) =>
   req.post("/api/jcz/edit/manager", query);
+
+/**
+ * 设置缴费经理
+ */
+export const banUserApi = (query: { userNo: string; isBand: boolean }) =>
+  req.post("/api/user/band", query);

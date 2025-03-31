@@ -60,7 +60,9 @@ export default function DepositCertificateDetail() {
   const handleCancelFee = useCallback(async () => {
     try {
       await cancelFeeApi({ jczNo: detailData?.jczNo, operator: user.userName });
-    } catch (e) {}
+    } catch (e: any) {
+      messageApi.error(e.errorMessage);
+    }
     getDepositCertificateDetail({
       roomNo: detailData.roomNo || "",
       caNo: detailData.caNo || "",
@@ -68,7 +70,7 @@ export default function DepositCertificateDetail() {
   }, [
     detailData?.caNo,
     detailData?.jczNo,
-    detailData.roomNo,
+    detailData?.roomNo,
     getDepositCertificateDetail,
     user.userName,
   ]);
@@ -81,7 +83,9 @@ export default function DepositCertificateDetail() {
           operator: user.userName,
           initYear: year,
         });
-      } catch (e) {}
+      } catch (e: any) {
+        messageApi.error(e.errorMessage);
+      }
       if (detailData.caNo && detailData.roomNo) {
         getDepositCertificateDetail({
           roomNo: detailData.roomNo,
@@ -90,9 +94,9 @@ export default function DepositCertificateDetail() {
       }
     },
     [
-      detailData.caNo,
+      detailData?.caNo,
       detailData?.jczNo,
-      detailData.roomNo,
+      detailData?.roomNo,
       getDepositCertificateDetail,
       user.userName,
     ]
@@ -215,7 +219,7 @@ export default function DepositCertificateDetail() {
           }}
         >
           <InitYear
-            disabled={!detailData.jczNo}
+            disabled={!detailData?.jczNo}
             cb={(year) => {
               handleInitYear(year);
             }}

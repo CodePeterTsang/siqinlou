@@ -69,7 +69,9 @@ const columns: TableProps<JCZDataType>["columns"] = [
     dataIndex: "jfList",
     key: "jfList",
     render: (jfList) => {
-      return jfList[0]?.created;
+      if (jfList && jfList.length) {
+        return jfList[0]?.created;
+      }
     },
   },
 

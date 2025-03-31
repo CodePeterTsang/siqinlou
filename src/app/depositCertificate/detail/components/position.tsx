@@ -108,7 +108,9 @@ export default function Position({
     if (isNewJcz) {
       form.setFieldsValue({ roomNo: "", caNo: "" });
     } else {
-      setGeList(form.getFieldValue("roomNo"), isNewJcz ? 0 : 1);
+      if (form.getFieldValue("roomNo")) {
+        setGeList(form.getFieldValue("roomNo"), isNewJcz ? 0 : 1);
+      }
     }
   }, [isNewJcz]);
 

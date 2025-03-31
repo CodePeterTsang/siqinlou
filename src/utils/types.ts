@@ -44,12 +44,15 @@ export type JCZFilter = {
   xrName?: string;
   wbrName?: string;
   jfStatus?: boolean;
+  qfType?: string;
+  qfYear?: string;
 };
 
 export interface XRDataType {
   id: number;
   xrName: string;
   created: string;
+  oriName?: string;
 }
 
 export interface JCZDataType {
@@ -94,6 +97,8 @@ export interface JXDataType {
   jfDesc?: string;
   yearCount?: string;
   manager?: string;
+  operator?: string;
+  operatingTime?: number;
 }
 
 export interface JfDataType {

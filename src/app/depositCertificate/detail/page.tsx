@@ -72,7 +72,8 @@ export default function DepositCertificateDetail() {
   const [showFeeDetail, setShowFeeDetail] = useState<boolean>(false);
   const [feeCount, setFeeCount] = useState<number>(0);
   const [userData, setUserData] = useState({ userName: "", role: "admin" });
-  const [manager, setManager] = useState<string>("");
+
+  const [askRecentPay, setAskRecentPay] = useState<boolean>(false);
 
   // 修改证
   const [reviseCertificate, setReviseCertificate] = useState<boolean>(false);
@@ -181,11 +182,13 @@ export default function DepositCertificateDetail() {
         setDetailData({ ...detailData, xrList: xrList });
       } else {
         const { jczNo } = detailData;
+        const editXrList = xrList.filter((item) => item.oriName);
         try {
           await jczEdit({
             jczNo,
-            xrList,
+            xrList: editXrList,
           });
+          messageApi.success("修改成功");
         } catch (e) {
           messageApi.open({
             type: "error",
@@ -318,8 +321,8 @@ export default function DepositCertificateDetail() {
     try {
       const { data } = await createJczNo();
       setDetailData({ jczNo: data, created: dayjs().format("YYYY-MM-DD") });
-    } catch (e) {
-      messageApi.error("新增失败");
+    } catch (e: any) {
+      messageApi.error(e.errorMessage);
     }
   };
 
@@ -400,6 +403,19 @@ export default function DepositCertificateDetail() {
 
   const handlePayButton = useCallback(() => {
     if (detailData?.jczNo) {
+      if (
+        detailData.jfList &&
+        detailData.jfList.length &&
+        detailData.jfList[0].operatingTime
+      ) {
+        if (
+          dayjs().valueOf() - detailData.jfList[0].operatingTime <
+          30 * 24 * 3600 * 1000
+        ) {
+          setAskRecentPay(true);
+          return;
+        }
+      }
       handleAllStatus(setShowFeeDetail);
       scrollToEnd();
     }
@@ -415,6 +431,15 @@ export default function DepositCertificateDetail() {
       });
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (addCertificate) {
+      setUrlParams({
+        roomNo: "",
+        caNo: "",
+      });
+    }
+  }, [addCertificate]);
 
   useEffect(() => {
     const user = getUser();
@@ -462,7 +487,11 @@ export default function DepositCertificateDetail() {
                     if (addCertificate) {
                       handleAllStatus(setInsideBox);
                     } else {
-                      handleAllStatus(setAskInsideDiscount);
+                      if (detailData?.jfStatus) {
+                        handleAllStatus(setAskInsideDiscount);
+                      } else {
+                        messageApi.error("请先缴清费用，再进行迁入操作");
+                      }
                     }
                   }}
                 >
@@ -475,7 +504,11 @@ export default function DepositCertificateDetail() {
                 <Button
                   disabled={!detailData.jczNo}
                   onClick={() => {
-                    handleAllStatus(setOutsideBox);
+                    if (detailData?.jfStatus) {
+                      handleAllStatus(setOutsideBox);
+                    } else {
+                      messageApi.error("请先缴清费用，再进行迁出操作");
+                    }
                   }}
                 >
                   迁出盒
@@ -897,6 +930,30 @@ export default function DepositCertificateDetail() {
         width={650}
       >
         <PrintContent ref={contentRef} data={detailData} />
+      </Modal>
+      <Modal
+        title="提示"
+        okText="是"
+        cancelText="否"
+        open={askRecentPay}
+        onOk={() => {
+          handleAllStatus(setShowFeeDetail);
+          scrollToEnd();
+          setAskRecentPay(false);
+        }}
+        onCancel={() => {
+          setAskRecentPay(false);
+        }}
+      >
+        <p>
+          本证于{detailData?.jfList && detailData?.jfList[0]?.created} 缴费
+          {detailData?.jfList && detailData?.jfList[0]?.money}
+          元，经手人：{detailData?.jfList && detailData?.jfList[0]?.operator}
+        </p>
+        <p>本寄存证最近曾缴费，请确认是否要继续缴费！</p>
+        <p>按“是”继续缴费</p>
+        <p>按“否”退出本次缴费</p>
+        <p>如有疑问，请联系管理员</p>
       </Modal>
     </div>
   );
