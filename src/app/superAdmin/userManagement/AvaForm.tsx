@@ -3,7 +3,7 @@ import { Button, Col, Form, Input, Row, Space, theme } from "antd";
 
 import { useState } from "react";
 
-const searchLabels = ["用户名"];
+const searchLabels = ["用户ID"];
 
 const AdvancedSearchForm = ({ cb }: { cb: (userNo: string) => void }) => {
   const { token } = theme.useToken();

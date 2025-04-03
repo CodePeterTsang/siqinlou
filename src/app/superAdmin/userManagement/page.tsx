@@ -292,13 +292,13 @@ export default function User() {
             <Input />
           </Form.Item>
 
-          <Form.Item<UserFieldType>
+          {/* <Form.Item<UserFieldType>
             label="密码"
             name="password"
             rules={[{ required: true, message: "请输入密码!" }]}
           >
             <Input.Password />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item<UserFieldType> label="新密码" name="newPassword">
             <Input.Password />

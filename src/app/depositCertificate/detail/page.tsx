@@ -69,6 +69,9 @@ export default function DepositCertificateDetail() {
   const [urlParams, setUrlParams] = useState({ roomNo: "", caNo: "" });
   const [detailData, setDetailData] = useState<JCZDataType>({ jczNo: "" });
   const [showFee, setShowFee] = useState<boolean>(false);
+  /**
+   * showFeeDetail 是为展示收费信息，点解缴费按钮
+   */
   const [showFeeDetail, setShowFeeDetail] = useState<boolean>(false);
   const [feeCount, setFeeCount] = useState<number>(0);
   const [userData, setUserData] = useState({ userName: "", role: "admin" });
@@ -456,9 +459,11 @@ export default function DepositCertificateDetail() {
   useEffect(() => {
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.code === "Enter" || e.code === "NumpadEnter") {
+        // 收费
         if (showFeeDetail && detailData?.jczNo) {
           handlePay();
         }
+        // 缴费单
         if (showFee && detailData?.jczNo) {
           setShowFee(false);
           printFee();
@@ -750,6 +755,7 @@ export default function DepositCertificateDetail() {
               wbrId={detailData?.wbrId}
               address={detailData?.address}
               agentIsRevise={reviseCertificate || addCertificate}
+              caNo={detailData?.caNo}
               valuesChangeCb={(value) => {
                 setDetailData({
                   ...detailData,
@@ -769,7 +775,7 @@ export default function DepositCertificateDetail() {
       >
         <Note
           jczDesc={detailData?.jczDesc}
-          noteDisabled={!reviseCertificate}
+          noteDisabled={!reviseCertificate && !addCertificate}
           valuesChangeCb={(value) => {
             setDetailData({
               ...detailData,

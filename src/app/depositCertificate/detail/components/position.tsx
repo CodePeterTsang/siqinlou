@@ -115,6 +115,7 @@ export default function Position({
   useEffect(() => {
     if (isNewJcz) {
       form.setFieldsValue({ roomNo: "", caNo: "" });
+      form.focusField("roomNo");
     } else {
       if (form.getFieldValue("roomNo")) {
         setGeList(form.getFieldValue("roomNo"), isNewJcz ? 0 : 1);

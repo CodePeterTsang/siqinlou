@@ -122,7 +122,7 @@ export default forwardRef(function PrintContent(
         </div>
         <div className={classNames(styles.note, styles.line)}>
           <span className={styles["item-title"]}>备注：</span>
-          <span className={styles["note-content"]}>{jxData?.jfDesc}</span>
+          <span className={styles["note-content"]}>{props.data?.jczDesc}</span>
         </div>
         <div className={classNames(styles["charge-man"], styles.line)}>
           <p>

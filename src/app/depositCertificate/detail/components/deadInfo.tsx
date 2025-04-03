@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
-import { Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
+import {
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Popconfirm,
+  Table,
+  Typography,
+} from "antd";
 import { XRDataType } from "@/utils/types";
+import dayjs from "dayjs";
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
   title: any;
-  inputType: "number" | "text";
+  inputType: "dateRange" | "text";
   record: XRDataType;
   index: number;
 }
@@ -22,7 +31,12 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+  const inputNode =
+    inputType === "dateRange" ? (
+      <DatePicker format={"YYYY-MM-DD"} maxDate={dayjs()} />
+    ) : (
+      <Input />
+    );
 
   return (
     <td {...restProps}>
@@ -74,7 +88,10 @@ export default function DeadInfo({
     type: "radio",
   };
   const edit = (record: Partial<XRDataType> & { id: React.Key }) => {
-    form.setFieldsValue({ name: "", age: "", address: "", ...record });
+    form.setFieldsValue({
+      ...record,
+      created: dayjs(record.created),
+    });
     setEditingKey(record.id);
   };
 
@@ -86,6 +103,10 @@ export default function DeadInfo({
     try {
       const row = (await form.validateFields()) as XRDataType;
 
+      const updateRow = {
+        ...row,
+        created: dayjs(row.created).format("YYYY-MM-DD"),
+      };
       const newData = [...(data as XRDataType[])];
       const index = newData.findIndex((item) => id === item.id);
       if (index > -1) {
@@ -93,12 +114,12 @@ export default function DeadInfo({
         newData.splice(index, 1, {
           ...item,
           oriName: item.xrName,
-          ...row,
+          ...updateRow,
         });
         setData(newData);
         setEditingKey(0);
       } else {
-        newData.push(row);
+        newData.push(updateRow);
         setData(newData);
         setEditingKey(0);
       }
@@ -160,7 +181,7 @@ export default function DeadInfo({
         ...col,
         onCell: (record: XRDataType) => ({
           record,
-          inputType: col.dataIndex === "created" ? "number" : "text",
+          inputType: col.dataIndex === "created" ? "dateRange" : "text",
           dataIndex: col.dataIndex,
           title: col.title,
           editing: isEditing(record),

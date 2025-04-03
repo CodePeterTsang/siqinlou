@@ -16,6 +16,7 @@ export default function Agent({
   address,
   wbrDesc,
   agentIsRevise,
+  caNo,
   valuesChangeCb,
 }: {
   wbrName: string | undefined;
@@ -24,16 +25,11 @@ export default function Agent({
   address: string | undefined;
   wbrDesc: string | undefined;
   agentIsRevise: boolean;
+  caNo: string | undefined;
   valuesChangeCb: (value: FieldType) => void;
 }) {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
-
-  const listStyle: React.CSSProperties = {
-    background: token.colorFillAlter,
-    borderRadius: token.borderRadiusLG,
-    padding: 12,
-  };
 
   const onValuesChange: FormProps<FieldType>["onValuesChange"] = (
     values,
@@ -53,6 +49,41 @@ export default function Agent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wbrName]);
 
+  useEffect(() => {
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "Enter" || e.code === "NumpadEnter") {
+        const activeElementId = document.activeElement?.id;
+        // 新增寄存证
+        if (agentIsRevise && caNo) {
+          switch (activeElementId) {
+            case "basic_caNo":
+              form.focusField("wbrName");
+              break;
+            case "agent_wbrName":
+              form.focusField("wbrId");
+              break;
+            case "agent_wbrId":
+              form.focusField("phoneNum");
+              break;
+            case "agent_phoneNum":
+              form.focusField("address");
+              break;
+            case "agent_address":
+              form.focusField("wbrDesc");
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keyup", onKeyUp);
+
+    return () => {
+      document.removeEventListener("keyup", onKeyUp);
+    };
+  }, [agentIsRevise, caNo]);
   return (
     <main>
       <Form
