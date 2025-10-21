@@ -4,7 +4,8 @@ const nextConfig = {
   /* config options here */
   output: "standalone",
   env: {
-    BASE_API_URL: "http://gy.topxixi.top:58080/",
+    // BASE_API_URL: "http://gy.topxixi.top:58080/",
+    BASE_API_URL: "http://gy.topxixi.top:48080/",
   },
 };
 

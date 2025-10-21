@@ -89,3 +89,21 @@ export const jfdPayApi = (query: JfPay) => req.post("/api/jfd/pay", query);
 
 export const cancelJczApi = (query: { jczNo: string; operator: string }) =>
   req.post("/api/jcz/cancel", query);
+
+export const queryUploadImage = (query: { jczNo: string }) =>
+  req.post("/api/image/query", query);
+
+export const uploadImage = (
+  data: FormData,
+  query: { jczNo: string; operator: string }
+) =>
+  req.post("/api/image/upload", data, {
+    params: query,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+export const downloadImage = (query: { id: string }) =>
+  req.post(`/api/image/download/${query.id}`, {}, { responseType: "blob" });
+
+export const deleteImage = (query: { id: string; operator: string }) =>
+  req.post(`/api/image/deleted`, query);

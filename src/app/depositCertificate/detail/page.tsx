@@ -30,6 +30,7 @@ import Note from "./components/note";
 import Position from "./components/position";
 import Agent from "./components/agent";
 import PrintContent from "./components/printContent";
+import PictureUpload from "./components/upload";
 import { useReactToPrint } from "react-to-print";
 import {
   Dispatch,
@@ -639,53 +640,74 @@ export default function DepositCertificateDetail() {
       )}
 
       <Flex justify="space-between" align="start" gap="small">
-        <Card
-          title="先人资料"
-          style={{
-            width: "35%",
-            height: "100%",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-            marginBottom: "5px",
-          }}
-          extra={
-            <div>
-              {outsideBox ? (
-                <Flex gap="small" wrap>
-                  <Button
-                    type="link"
-                    onClick={() => {
-                      handleOutsideBox(true);
-                    }}
-                  >
-                    确认迁出
-                  </Button>
-                  <Button
-                    type="text"
-                    onClick={() => {
-                      handleOutsideBox(false);
-                    }}
-                  >
-                    取消
-                  </Button>
-                </Flex>
-              ) : (
-                ""
-              )}
-            </div>
-          }
+        <Flex
+          justify="space-between"
+          align="center"
+          vertical
+          style={{ width: "35%" }}
         >
-          <DeadInfo
-            list={detailData?.xrList}
-            valuesChangeCb={(xrList) => {
-              handleReviseBox(xrList);
+          <Card
+            title="先人资料"
+            style={{
+              width: "100%",
+              height: "100%",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+              marginBottom: "5px",
             }}
-            outsideBox={outsideBox}
-            outsideSelected={(selected) => {
-              setOutsideBoxSelected(selected.xrName);
+            extra={
+              <div>
+                {outsideBox ? (
+                  <Flex gap="small" wrap>
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        handleOutsideBox(true);
+                      }}
+                    >
+                      确认迁出
+                    </Button>
+                    <Button
+                      type="text"
+                      onClick={() => {
+                        handleOutsideBox(false);
+                      }}
+                    >
+                      取消
+                    </Button>
+                  </Flex>
+                ) : (
+                  ""
+                )}
+              </div>
+            }
+          >
+            <DeadInfo
+              list={detailData?.xrList}
+              valuesChangeCb={(xrList) => {
+                handleReviseBox(xrList);
+              }}
+              outsideBox={outsideBox}
+              outsideSelected={(selected) => {
+                setOutsideBoxSelected(selected.xrName);
+              }}
+              isNewJcz={addCertificate}
+            />
+          </Card>
+          <Card
+            className={styles["certificate-width"]}
+            title="寄存位置"
+            style={{
+              width: "100%",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+              marginBottom: "5px",
             }}
-            isNewJcz={addCertificate}
-          />
-        </Card>
+          >
+            <PictureUpload
+              jczNo={detailData?.jczNo}
+              operator={userData.userName}
+            />
+          </Card>
+        </Flex>
         <Flex
           justify="space-between"
           align="center"
