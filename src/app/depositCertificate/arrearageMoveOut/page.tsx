@@ -11,6 +11,7 @@ import { jczApi, exportJcz } from "../api";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useSetRoomList } from "@/utils/store/useConfigStore";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { stat } from "fs";
 
 export default function User() {
   const { token } = theme.useToken();
@@ -45,6 +46,7 @@ export default function User() {
   const initJCZList = useCallback(async () => {
     const jczListQuery = {
       ...jczFilter,
+      status: 2, //欠费迁出状态
       pageNum,
       pageSize,
     };
@@ -94,48 +96,12 @@ export default function User() {
     }
   }, []);
 
-  // 导出 Excel
-  const handleExport = useCallback(async () => {
-    try {
-      const params = {
-        ...jczFilter,
-        pageSize: 100000,
-      };
-      const res = await exportJcz(params);
-      const blob = res instanceof Blob ? res : null;
-      if (!blob) {
-        messageApi.error("导出失败：返回数据格式不支持");
-        return;
-      }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "寄存证列表.xlsx";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      messageApi.success("导出成功");
-    } catch (err) {
-      console.error(err);
-      messageApi.error("导出失败");
-    }
-  }, [jczFilter]);
-
   return (
     <main className={styles.userWrap}>
       <div className={styles.content}>
         {messageContextHolder}
         <AvaForm onFilter={onFilter} />
-        <div style={{ marginTop: 12, marginBottom: 8 }}>
-          <Button
-            type="primary"
-            icon={<DownloadOutlined />}
-            onClick={handleExport}
-          >
-            导出
-          </Button>
-        </div>
+
         <br />
         <div style={listStyle}>
           <Table

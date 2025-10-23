@@ -30,6 +30,7 @@ interface JczQuery {
   wbrName?: string;
   jfStatus?: boolean;
   isFuzzy?: boolean;
+  status?: number;
 }
 
 interface JczEditQuery {
@@ -87,8 +88,11 @@ export const createJczApi = (query: JczCreateQuery) =>
 
 export const jfdPayApi = (query: JfPay) => req.post("/api/jfd/pay", query);
 
-export const cancelJczApi = (query: { jczNo: string; operator: string }) =>
-  req.post("/api/jcz/cancel", query);
+export const cancelJczApi = (query: {
+  jczNo: string;
+  operator: string;
+  operation: 1 | 2;
+}) => req.post("/api/jcz/cancel", query);
 
 export const queryUploadImage = (query: { jczNo: string }) =>
   req.post("/api/image/query", query);
@@ -107,3 +111,6 @@ export const downloadImage = (query: { id: string }) =>
 
 export const deleteImage = (query: { id: string; operator: string }) =>
   req.post(`/api/image/deleted`, query);
+
+export const exportJcz = (query: JczQuery) =>
+  req.post(`/api/jcz/export`, query, { responseType: "blob" });

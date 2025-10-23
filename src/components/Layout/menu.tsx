@@ -66,6 +66,12 @@ const getNavList = () => {
           icon: <FileMarkdownOutlined />,
           label: "寄存证详情",
         },
+        ,
+        {
+          key: "/depositCertificate/arrearageMoveOut",
+          icon: <FileMarkdownOutlined />,
+          label: "欠费迁出管理",
+        },
       ],
     },
     // {

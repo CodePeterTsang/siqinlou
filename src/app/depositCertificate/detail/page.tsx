@@ -88,6 +88,9 @@ export default function DepositCertificateDetail() {
   // 注销证
   const [cancelCertificate, setCancelCertificate] = useState<boolean>(false);
 
+  // 清缴出盒
+  const [clearPayment, setClearPayment] = useState<boolean>(false);
+
   // 迁入盒
   const [insideBox, setInsideBox] = useState<boolean>(false);
   const [askInsideDiscount, setAskInsideDiscount] = useState<boolean>(false);
@@ -143,12 +146,27 @@ export default function DepositCertificateDetail() {
       await cancelJczApi({
         jczNo: detailData?.jczNo,
         operator: userData.userName,
+        operation: 1,
       });
       messageApi.success("注销成功");
     } catch (e: any) {
       messageApi.error(e?.errorMessage);
     }
     setCancelCertificate(false);
+  }, [detailData?.jczNo, messageApi]);
+
+  const handleClearPayment = useCallback(async () => {
+    try {
+      await cancelJczApi({
+        jczNo: detailData?.jczNo,
+        operator: userData.userName,
+        operation: 2,
+      });
+      messageApi.success("清缴成功");
+    } catch (e: any) {
+      messageApi.error(e?.errorMessage);
+    }
+    setClearPayment(false);
   }, [detailData?.jczNo, messageApi]);
 
   // 修改证
@@ -529,6 +547,18 @@ export default function DepositCertificateDetail() {
               )}
               {userData.role === "admin" ? (
                 <Button
+                  disabled={!detailData.jczNo || detailData?.jfStatus}
+                  onClick={() => {
+                    handleAllStatus(setClearPayment);
+                  }}
+                >
+                  清缴出盒
+                </Button>
+              ) : (
+                ""
+              )}
+              {userData.role === "admin" ? (
+                <Button
                   disabled={addCertificate}
                   onClick={() => {
                     handleAllStatus(setAskDiscount);
@@ -882,6 +912,16 @@ export default function DepositCertificateDetail() {
         }}
       >
         <p>是否确认注销编号为{detailData?.jczNo}的寄存证</p>
+      </Modal>
+      <Modal
+        title="清缴出盒"
+        open={clearPayment}
+        onOk={handleClearPayment}
+        onCancel={() => {
+          setClearPayment(false);
+        }}
+      >
+        <p>是否确认清缴编号为{detailData?.jczNo}的寄存证</p>
       </Modal>
       <Modal
         title="迁入盒"
