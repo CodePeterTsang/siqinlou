@@ -44,8 +44,7 @@ export default function PictureUpload({
   }, [jczNo]);
   // 照片墙相关状态
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState(false);
+
   const [messageApi, contextHolder] = message.useMessage();
 
   // 上传前校验
@@ -58,20 +57,27 @@ export default function PictureUpload({
     return true;
   };
 
-  // 预览处理
-  const handlePreview = async (file: UploadFile) => {
-    setPreviewImage(file.url || (file.preview as string));
-    setPreviewOpen(true);
-  };
-
   // 上传变更
   const handleChange = ({
+    file: newFile,
     fileList: newFileList,
   }: {
+    file: UploadFile;
     fileList: UploadFile[];
   }) => {
+    console.log("handleChange", newFile, newFileList);
     // 自动移除上传失败的图片
-    const filteredList = newFileList.filter((file) => file.status !== "error");
+    const filteredList = newFileList
+      .filter((file) => file.status !== "error")
+      .map((item) => {
+        if (item.uid === newFile?.uid && newFile.status === "done") {
+          return {
+            ...newFile,
+            ...(newFile as any).response,
+            uid: (newFile as any).response?.id,
+          };
+        } else return item;
+      });
     if (filteredList.length < newFileList.length) {
       messageApi.warning("图片上传失败");
     }
@@ -91,13 +97,15 @@ export default function PictureUpload({
       return;
     }
 
-    const { file, onSuccess, onError, data } = options;
+    const { file, onSuccess, onError } = options;
     try {
       // 只处理 File 或 Blob 类型
       if (file instanceof File) {
         const formData = new FormData();
         formData.append("file", file);
+
         const res = await uploadImage(formData, { jczNo, operator });
+
         if (res) {
           if (onSuccess) {
             onSuccess(res, file as any);
@@ -147,7 +155,7 @@ export default function PictureUpload({
           (f: any) => (f as any).id === file.id || (f as any).uid === file.uid
         );
         const newItem: UploadFile = {
-          uid: file.uid || file.id,
+          uid: file.id,
           name: file.name || "图片",
           status: "done",
           url: imageUrl,
@@ -172,12 +180,13 @@ export default function PictureUpload({
   // 删除图片（点击删除图标时调用后端并从列表移除）
   const handleRemove = async (file: UploadFile) => {
     try {
+      console.log("remove", file);
       // 如果有后端 id，调用后端删除接口
-      const id = (file as any).id;
+      const id = (file as any).uid;
       if (id) {
         const res = await deleteImage({ id, operator });
         // 可根据后端返回判断是否成功
-        if (!res || (res && (res as any).errorMessage)) {
+        if (res) {
           messageApi.error("删除失败");
           return false;
         }

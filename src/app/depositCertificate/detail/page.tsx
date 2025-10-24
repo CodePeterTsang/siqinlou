@@ -725,7 +725,7 @@ export default function DepositCertificateDetail() {
           </Card>
           <Card
             className={styles["certificate-width"]}
-            title="寄存位置"
+            title="相关图片"
             style={{
               width: "100%",
               boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
