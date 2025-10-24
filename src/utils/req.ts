@@ -42,7 +42,7 @@ instance.interceptors.response.use(
         case 401:
           // 客户端环境
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          window && (location.href = "/login");
+          window && (location.href = "/appLogin");
           break;
         case 500:
           message.error(error.response.data.msg || "请求失败");
@@ -53,7 +53,7 @@ instance.interceptors.response.use(
             message.error("登录过期，请重新登录");
             setTimeout(() => {
               // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-              window && (location.href = "/login");
+              window && (location.href = "/appLogin");
             }, 500);
             return;
           }

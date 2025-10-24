@@ -70,7 +70,7 @@ const CommonLayout: React.FC<IProps> = ({
       await logoutApi(userNo);
       removeToken();
       removeUser();
-      router.push("./login");
+      router.push("./appLogin");
     } catch (e) {}
   };
 
@@ -111,7 +111,7 @@ const CommonLayout: React.FC<IProps> = ({
         },
       }}
     >
-      {pathname === "/login" ? (
+      {pathname === "/appLogin" ? (
         <>{children}</>
       ) : (
         <Layout style={{ minHeight: "100vh" }}>
