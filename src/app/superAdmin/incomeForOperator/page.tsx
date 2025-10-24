@@ -23,7 +23,6 @@ import {
   userEditApi,
   userListApi,
 } from "../api";
-import { logoutApi } from "@/app/login/api";
 import router from "next/router";
 type UserFieldType = {
   userNo?: string;

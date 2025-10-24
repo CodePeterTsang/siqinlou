@@ -93,3 +93,6 @@ export const editManagerApi = (query: { manager: string }) =>
  */
 export const banUserApi = (query: { userNo: string; isBand: boolean }) =>
   req.post("/api/user/band", query);
+
+export const logoutApi = (userNo: string) =>
+  req.post("/api/user/logout", { userNo: userNo });

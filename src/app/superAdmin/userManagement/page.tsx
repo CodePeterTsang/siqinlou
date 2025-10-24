@@ -17,8 +17,13 @@ import { data, UserListDataType } from "./column";
 // import Layout from "@/components/Layout";
 import styles from "./index.module.less";
 import { useCallback, useEffect, useState } from "react";
-import { banUserApi, userCreateApi, userEditApi, userListApi } from "../api";
-import { logoutApi } from "@/app/login/api";
+import {
+  banUserApi,
+  userCreateApi,
+  userEditApi,
+  userListApi,
+  logoutApi,
+} from "../api";
 import router from "next/router";
 type UserFieldType = {
   userNo?: string;
