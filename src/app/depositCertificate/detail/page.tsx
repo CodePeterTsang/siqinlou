@@ -109,10 +109,18 @@ export default function DepositCertificateDetail() {
     borderRadius: token.borderRadiusLG,
   };
 
+  // 保持 detailData 的最新引用，避免闭包拿到旧值
+  const detailRef = useRef(detailData);
+  useEffect(() => {
+    detailRef.current = detailData;
+  }, [detailData]);
+
   const getDepositCertificateDetail = useCallback(
     async ({ roomNo, caNo }: { roomNo: string; caNo: string }) => {
       if (addCertificate) {
-        setDetailData({ ...detailData, roomNo, caNo });
+        // 使用 ref 获取最新的 detailData，避免闭包旧值
+
+        setDetailData({ jczNo: detailRef.current?.jczNo, roomNo, caNo });
       } else if (roomNo && caNo) {
         {
           const query = {
@@ -131,7 +139,8 @@ export default function DepositCertificateDetail() {
         setDetailData({ roomNo, caNo, jczNo: "" });
       }
     },
-    [addCertificate, detailData]
+    // 仅依赖 addCertificate；不要把整个 detailData 放进 deps 以避免闭包问题
+    [addCertificate]
   );
 
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -343,15 +352,16 @@ export default function DepositCertificateDetail() {
       setDetailData({ jczNo: "" });
     }
   };
-  const handleNewJczNo = async () => {
+  const handleNewJczNo = useCallback(async () => {
     try {
       const { data } = await createJczNo();
+
       setDetailData({ jczNo: data, created: dayjs().format("YYYY-MM-DD") });
     } catch (e: any) {
       setAddCertificate(false);
       messageApi.error("创建寄存证失败，请重试");
     }
-  };
+  }, [addCertificate]);
 
   const handlePay = useCallback(async () => {
     if (!feeCount) {
@@ -649,6 +659,13 @@ export default function DepositCertificateDetail() {
             created={detailData?.created}
             jfEndYear={detailData?.jfEndYear}
             jfStatus={detailData?.jfStatus}
+            isNewJcz={addCertificate}
+            valuesChangeCb={(value) => {
+              setDetailData({
+                ...detailData,
+                created: value.created,
+              });
+            }}
           />
         </Card>
       ) : (
@@ -665,6 +682,13 @@ export default function DepositCertificateDetail() {
             created={detailData?.created}
             jfEndYear={detailData?.jfEndYear}
             jfStatus={detailData?.jfStatus}
+            isNewJcz={addCertificate}
+            valuesChangeCb={(value) => {
+              setDetailData({
+                ...detailData,
+                created: value.created,
+              });
+            }}
           />
         </Card>
       )}

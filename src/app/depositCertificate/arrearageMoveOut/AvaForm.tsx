@@ -91,7 +91,7 @@ const AdvancedSearchForm = ({
         },
         {
           value: 3,
-          label: "注销",
+          label: "清缴",
         },
       ],
     },

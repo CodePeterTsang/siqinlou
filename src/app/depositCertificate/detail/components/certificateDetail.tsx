@@ -1,6 +1,7 @@
 "use client";
-import { Flex, Form, FormProps, Input, Table, TableProps, theme } from "antd";
+import { Flex, Form, FormProps, Input, DatePicker, theme } from "antd";
 import { useEffect } from "react";
+import dayjs from "dayjs";
 type FieldType = {
   jczNo?: string;
   created?: string;
@@ -12,11 +13,15 @@ export default function CertificateDetail({
   created,
   jfEndYear,
   jfStatus,
+  isNewJcz,
+  valuesChangeCb,
 }: {
   jczNo: string | undefined;
   created: string | undefined;
   jfEndYear: string | undefined;
   jfStatus: boolean | undefined;
+  isNewJcz: boolean;
+  valuesChangeCb: (value: FieldType) => void;
 }) {
   const [form] = Form.useForm();
 
@@ -30,10 +35,26 @@ export default function CertificateDetail({
     console.log("Failed:", errorInfo);
   };
 
+  const onValuesChange: FormProps<FieldType>["onValuesChange"] = (
+    values,
+    allValues
+  ) => {
+    // 如果 created 是 dayjs 对象，格式化为 YYYY-MM-DD 字符串再回传
+    const formatted = {
+      ...allValues,
+      created: allValues.created
+        ? dayjs(allValues.created).format("YYYY-MM-DD")
+        : undefined,
+    } as FieldType;
+
+    valuesChangeCb(formatted);
+  };
+
   useEffect(() => {
     form.setFieldsValue({
       jczNo,
-      created,
+      // 将字符串日期转换为 dayjs 对象以供 DatePicker 显示
+      created: created ? dayjs(created) : undefined,
       jfEndYear,
       jfStatus: jfStatus === undefined ? "" : jfStatus ? "正常" : "欠费",
     });
@@ -46,22 +67,24 @@ export default function CertificateDetail({
         name="certificateDetail"
         initialValues={{ remember: true }}
         onFinish={onFinish}
+        onValuesChange={onValuesChange}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         form={form}
         layout="inline"
         wrapperCol={{
-          span: 12,
+          span: 15,
         }}
       >
-        {/* <Flex gap="small" wrap>
-       
-        </Flex> */}
         <Form.Item<FieldType> label="寄存证编号" name="jczNo">
           <Input disabled placeholder="寄存证编号" variant="borderless" />
         </Form.Item>
         <Form.Item<FieldType> label="开户日期" name="created">
-          <Input placeholder="开户日期" variant="borderless" />
+          <DatePicker
+            disabled={!isNewJcz}
+            format="YYYY-MM-DD"
+            placeholder="开户日期"
+          />
         </Form.Item>
         <Form.Item<FieldType> label="缴费止年限" name="jfEndYear">
           <Input disabled placeholder="缴费止年限" variant="borderless" />
