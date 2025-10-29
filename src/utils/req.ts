@@ -45,7 +45,7 @@ instance.interceptors.response.use(
           window && (location.href = "/appLogin");
           break;
         case 500:
-          message.error(error.response.data.msg || "请求失败");
+          message.error(error.response.data.errorMessage || "请求失败");
           return;
 
         case 400:

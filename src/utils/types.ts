@@ -75,6 +75,7 @@ export interface JCZDataType {
   jfList?: JXDataType[];
   operator?: string;
   manager?: string;
+  status?: 0 | 3 | 2; //0就证明系普通欠费，2就系已经进行咗欠费迁出，3就系清缴过
 }
 
 export const caTypeMap = {

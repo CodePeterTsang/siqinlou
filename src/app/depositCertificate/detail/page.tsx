@@ -162,7 +162,7 @@ export default function DepositCertificateDetail() {
         operator: userData.userName,
         operation: 2,
       });
-      messageApi.success("清缴成功");
+      messageApi.success("欠费迁出成功");
     } catch (e: any) {
       messageApi.error(e?.errorMessage);
     }
@@ -552,7 +552,7 @@ export default function DepositCertificateDetail() {
                     handleAllStatus(setClearPayment);
                   }}
                 >
-                  清缴出盒
+                  欠费迁出出盒
                 </Button>
               ) : (
                 ""
@@ -914,14 +914,14 @@ export default function DepositCertificateDetail() {
         <p>是否确认注销编号为{detailData?.jczNo}的寄存证</p>
       </Modal>
       <Modal
-        title="清缴出盒"
+        title="欠费迁出"
         open={clearPayment}
         onOk={handleClearPayment}
         onCancel={() => {
           setClearPayment(false);
         }}
       >
-        <p>是否确认清缴编号为{detailData?.jczNo}的寄存证</p>
+        <p>是否确认欠费迁出编号为{detailData?.jczNo}的寄存证</p>
       </Modal>
       <Modal
         title="迁入盒"

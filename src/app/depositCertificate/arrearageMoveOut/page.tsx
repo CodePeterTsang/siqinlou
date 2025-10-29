@@ -2,7 +2,7 @@
 import { Table, theme, Button, message } from "antd";
 // import { useRouter } from 'next/navigation';
 import AvaForm from "./AvaForm";
-import { columns, data, expandColumns } from "./column";
+import { columns, data, expandColumns, setRefreshCallback } from "./column";
 // import Layout from "@/components/Layout";
 import styles from "./index.module.less";
 import { useCallback, useEffect, useState } from "react";
@@ -46,7 +46,7 @@ export default function User() {
   const initJCZList = useCallback(async () => {
     const jczListQuery = {
       ...jczFilter,
-      status: 2, //欠费迁出状态
+      jfStatus: false,
       pageNum,
       pageSize,
     };
@@ -80,6 +80,10 @@ export default function User() {
 
   useEffect(() => {
     initJCZList();
+    setRefreshCallback(() => {
+      initJCZList();
+      messageApi.success("清缴成功");
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNum, pageSize, jczFilter]);
 

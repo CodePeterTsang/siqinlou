@@ -114,3 +114,5 @@ export const deleteImage = (query: { id: string; operator: string }) =>
 
 export const exportJcz = (query: JczQuery) =>
   req.post(`/api/jcz/export`, query, { responseType: "blob" });
+
+export const clearPay = (query: JfPay) => req.post(`/api/jfd/clearPay`, query);

@@ -76,21 +76,25 @@ const AdvancedSearchForm = ({
       placeholder: "请填写委办人名称",
       type: "input",
     },
-    // {
-    //   label: "注销状态",
-    //   key: "status",
-    //   placeholder: "请选择注销状态",
-    //   options: [
-    //     {
-    //       value: 0,
-    //       label: "否",
-    //     },
-    //     {
-    //       value: 1,
-    //       label: "是",
-    //     },
-    //   ],
-    // },
+    {
+      label: "欠费状态",
+      key: "status",
+      placeholder: "请选择注销状态",
+      options: [
+        {
+          value: 0,
+          label: "正常",
+        },
+        {
+          value: 2,
+          label: "欠费迁出",
+        },
+        {
+          value: 3,
+          label: "注销",
+        },
+      ],
+    },
     // {
     //   label: "缴费状态",
     //   key: "jfStatus",
