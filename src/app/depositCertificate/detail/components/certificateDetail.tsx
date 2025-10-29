@@ -61,7 +61,7 @@ export default function CertificateDetail({
           <Input disabled placeholder="寄存证编号" variant="borderless" />
         </Form.Item>
         <Form.Item<FieldType> label="开户日期" name="created">
-          <Input disabled placeholder="开户日期" variant="borderless" />
+          <Input placeholder="开户日期" variant="borderless" />
         </Form.Item>
         <Form.Item<FieldType> label="缴费止年限" name="jfEndYear">
           <Input disabled placeholder="缴费止年限" variant="borderless" />

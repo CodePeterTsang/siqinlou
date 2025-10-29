@@ -7,9 +7,10 @@ import {
   message,
 } from "antd";
 import dayjs from "dayjs";
-import { clearPay } from "../api";
+import { cancelJczApi, clearPay } from "../api";
 import { getUser } from "@/utils/auth";
 import { managerApi } from "@/app/superAdmin/api";
+import Link from "next/link";
 interface DataType {
   key: string;
   name: string;
@@ -21,8 +22,12 @@ interface DataType {
 }
 
 // 模块内可设置的刷新回调，父组件可通过 setRefreshCallback 注入刷新函数
-let refreshCallback: (() => void) | undefined;
-export const setRefreshCallback = (cb: (() => void) | undefined) => {
+let refreshCallback:
+  | ((type: "error" | "success", message: string) => void)
+  | undefined;
+export const setRefreshCallback = (
+  cb: ((type: "error" | "success", message: string) => void) | undefined
+) => {
   refreshCallback = cb;
 };
 
@@ -123,55 +128,103 @@ const columns: TableProps<JCZDataType>["columns"] = [
     title: "操作",
     key: "action",
     render: (_, record) => {
-      if (record.status === 2) {
+      if (record.status === 0) {
+        // 正常欠费状态只允许查看详情
         return (
-          <a
-            onClick={async () => {
-              try {
-                const { data } = await managerApi();
+          <Space size="middle">
+            <Link
+              href={`/depositCertificate/detail?roomNo=${record.roomNo}&caNo=${record.caNo}`}
+            >
+              详情
+            </Link>
+            <a
+              onClick={async () => {
                 const user = JSON.parse(getUser() || "{}");
 
-                const { jczNo } = record;
-
-                const startYear = record.jfEndYear
-                  ? parseInt(record.jfEndYear) + 1
-                  : dayjs().year();
-                const endYear = new Date().getFullYear();
-                const feeCount = endYear - startYear + 1;
-                const xrLength = record.xrList?.length || 0;
-                const unit =
-                  record.caType && record.caType > xrLength
-                    ? record.caType
-                    : xrLength;
-                const res = await clearPay({
-                  jczNo,
-                  operator: user.userName,
-                  endYear: endYear.toString(),
-                  money: `${feeCount * unit * 150}`,
-                  jfCount: unit.toString(),
-                  manager: data,
-                  yearCount: feeCount.toString(),
-                  startYear: startYear.toString(),
-                });
-                // 根据后端返回结构判断成功与否
-                if (res) {
-                  // message.success("清缴成功");
-                  // 清缴成功时触发父组件刷新列表（如果已注册回调）
-                  try {
-                    if (refreshCallback) refreshCallback();
-                  } catch (e) {
-                    // 忽略回调中的错误，已在父组件处理刷新
-                    console.error("refresh callback error", e);
-                  }
+                try {
+                  await cancelJczApi({
+                    jczNo: record?.jczNo,
+                    operator: user.userName,
+                    operation: 2,
+                  });
+                  if (refreshCallback)
+                    refreshCallback("success", "欠费迁出成功");
+                } catch (e: any) {
+                  if (refreshCallback) refreshCallback("error", "欠费迁出失败");
                 }
-              } catch (err) {
-                console.error(err);
-                // message.error("清缴失败");
-              }
-            }}
-          >
-            清缴
-          </a>
+              }}
+            >
+              欠费迁出
+            </a>
+          </Space>
+        );
+      } else if (record.status === 2) {
+        // 欠费迁出状态允许查看详情和清缴
+        return (
+          <Space size="middle">
+            <Link
+              href={`/depositCertificate/detail?roomNo=${record.roomNo}&caNo=${record.caNo}`}
+            >
+              详情
+            </Link>
+            <a
+              onClick={async () => {
+                try {
+                  const { data } = await managerApi();
+                  const user = JSON.parse(getUser() || "{}");
+
+                  const { jczNo } = record;
+
+                  const startYear = record.jfEndYear
+                    ? parseInt(record.jfEndYear) + 1
+                    : dayjs().year();
+                  const endYear = new Date().getFullYear();
+                  const feeCount = endYear - startYear + 1;
+                  const xrLength = record.xrList?.length || 0;
+                  const unit =
+                    record.caType && record.caType > xrLength
+                      ? record.caType
+                      : xrLength;
+                  const res = await clearPay({
+                    jczNo,
+                    operator: user.userName,
+                    endYear: endYear.toString(),
+                    money: `${feeCount * unit * 150}`,
+                    jfCount: unit.toString(),
+                    manager: data,
+                    yearCount: feeCount.toString(),
+                    startYear: startYear.toString(),
+                  });
+                  // 根据后端返回结构判断成功与否
+                  if (res) {
+                    try {
+                      if (refreshCallback)
+                        refreshCallback("success", "清缴成功");
+                    } catch (e) {
+                      console.error("refresh callback error", e);
+                      if (refreshCallback) refreshCallback("error", "清缴失败");
+                    }
+                  }
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+            >
+              清缴
+            </a>
+          </Space>
+        );
+      }
+      if (record.status === 3) {
+        // 清缴状态只允许查看详情
+        return (
+          <Space size="middle">
+            <Link
+              href={`/depositCertificate/detail?roomNo=${record.roomNo}&caNo=${record.caNo}`}
+            >
+              详情
+            </Link>
+          </Space>
         );
       } else {
         return null;

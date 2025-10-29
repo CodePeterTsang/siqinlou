@@ -80,9 +80,13 @@ export default function User() {
 
   useEffect(() => {
     initJCZList();
-    setRefreshCallback(() => {
-      initJCZList();
-      messageApi.success("清缴成功");
+    setRefreshCallback((type: "error" | "success", message: string) => {
+      if (type === "error") {
+        messageApi.error(message);
+      } else {
+        initJCZList();
+        messageApi.success(message);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNum, pageSize, jczFilter]);

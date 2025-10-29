@@ -113,6 +113,6 @@ export const deleteImage = (query: { id: string; operator: string }) =>
   req.post(`/api/image/deleted`, query);
 
 export const exportJcz = (query: JczQuery) =>
-  req.post(`/api/jcz/export`, query, { responseType: "blob" });
+  req.post(`/api/jcz/export`, query, { responseType: "blob", timeout: 120000 });
 
 export const clearPay = (query: JfPay) => req.post(`/api/jfd/clearPay`, query);
