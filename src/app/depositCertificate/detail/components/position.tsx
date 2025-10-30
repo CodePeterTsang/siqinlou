@@ -59,6 +59,7 @@ export default function Position({
 
   const onRoomChange = (value: string) => {
     setGeList(value, isNewJcz ? 0 : 1);
+
     form.setFieldsValue({ caNo: "" });
 
     setDetailQuery({
@@ -78,6 +79,7 @@ export default function Position({
       ...detailQuery,
       caNo: value,
     });
+
     cb({
       ...detailQuery,
       caNo: value,
@@ -89,7 +91,6 @@ export default function Position({
       await setRoomList();
       if (roomNo && caNo) {
         await setGeList(roomNo, isNewJcz ? 0 : 1);
-
         form.setFieldsValue({ roomNo: roomNo, caNo: caNo });
         setDetailQuery({
           ...detailQuery,
@@ -103,10 +104,11 @@ export default function Position({
         });
       }
     }
-
-    fetchData();
+    if (!isNewJcz) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setRoomList, roomNo, caNo, isNewJcz]);
+  }, [setRoomList, roomNo, caNo, isNewJcz, form, isNewJcz]);
 
   useEffect(() => {
     form.setFieldValue("caType", caType ? caTypeMap[caType] : "");

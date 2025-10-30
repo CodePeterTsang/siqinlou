@@ -119,8 +119,11 @@ export default function DepositCertificateDetail() {
     async ({ roomNo, caNo }: { roomNo: string; caNo: string }) => {
       if (addCertificate) {
         // 使用 ref 获取最新的 detailData，避免闭包旧值
-
-        setDetailData({ jczNo: detailRef.current?.jczNo, roomNo, caNo });
+        setDetailData({
+          jczNo: detailRef.current?.jczNo,
+          roomNo,
+          caNo,
+        });
       } else if (roomNo && caNo) {
         {
           const query = {
@@ -318,45 +321,52 @@ export default function DepositCertificateDetail() {
     [askDiscount]
   );
 
-  const handleAddCertificate = async (isAdd: boolean) => {
-    if (isAdd) {
-      if (
-        !detailData.roomNo ||
-        !detailData.caNo ||
-        !detailData.wbrName ||
-        !detailData.xrList?.length
-      ) {
-        messageApi.info("请填写室号、格号、先人信息和委办人名称");
-        return;
-      }
+  const handleAddCertificate = useCallback(
+    async (isAdd: boolean) => {
+      if (isAdd) {
+        if (
+          !detailData.roomNo ||
+          !detailData.caNo ||
+          !detailData.wbrName ||
+          !detailData.xrList?.length
+        ) {
+          messageApi.info("请填写室号、格号、先人信息和委办人名称");
+          return;
+        }
 
-      try {
-        const { data } = await createJczApi({
-          ...detailData,
-          operator: userData.userName,
-          isDiscount: hasDiscount ? 1 : 0,
-        });
-        getDepositCertificateDetail({
-          roomNo: detailData.roomNo || "",
-          caNo: detailData.caNo || "",
-        });
+        try {
+          const { data } = await createJczApi({
+            ...detailData,
+            operator: userData.userName,
+            isDiscount: hasDiscount ? 1 : 0,
+          });
+          // 使用 ref 获取最新的 detailData，避免闭包旧值
+          getDepositCertificateDetail({
+            roomNo: detailData.roomNo || "",
+            caNo: detailData.caNo || "",
+          });
+          setAddCertificate(false);
+          setDetailData(data);
+          handlePayButton();
+          messageApi.success("新增寄存证成功");
+        } catch (e: any) {
+          messageApi.error(e?.errorMessage);
+        }
+      } else {
         setAddCertificate(false);
-        setDetailData(data);
-        handlePayButton();
-        messageApi.success("新增寄存证成功");
-      } catch (e: any) {
-        messageApi.error(e?.errorMessage);
+        setDetailData({ jczNo: "" });
       }
-    } else {
-      setAddCertificate(false);
-      setDetailData({ jczNo: "" });
-    }
-  };
+    },
+    [detailData]
+  );
   const handleNewJczNo = useCallback(async () => {
     try {
       const { data } = await createJczNo();
 
-      setDetailData({ jczNo: data, created: dayjs().format("YYYY-MM-DD") });
+      setDetailData({
+        jczNo: data,
+        created: dayjs().format("YYYY-MM-DD"),
+      });
     } catch (e: any) {
       setAddCertificate(false);
       messageApi.error("创建寄存证失败，请重试");
