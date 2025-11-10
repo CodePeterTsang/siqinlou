@@ -27,14 +27,21 @@ export default function PictureUpload({
     const fetchData = async () => {
       if (jczNo) {
         const response = await queryUploadImage({ jczNo });
-        const images: UploadFile[] = (response.data || []).map((img: any) => ({
-          ...img,
-          uid: img.id,
-          name: img.name || "图片",
-          status: "done",
-          url: img.url,
-        }));
-        setFileList(images);
+        const images: UploadFile[] = [];
+        await Promise.all(
+          (response.data || []).map(async (img: any) => {
+            const imageUrl = await handleDownload(img.id);
+            images.push({
+              ...img,
+              uid: img.id,
+              name: img.imageName || "图片",
+              status: imageUrl ? "done" : "error",
+              url: imageUrl,
+            });
+          })
+        ).then(() => {
+          setFileList(images);
+        });
       } else {
         setFileList([]);
       }
@@ -128,15 +135,15 @@ export default function PictureUpload({
   };
 
   // 下载图片方法
-  const handleDownload = async (file: any) => {
-    console.log("download", file);
-    if (!file?.id) {
+  const handleDownload = async (imageId: string) => {
+    // console.log("download", file);
+    if (!imageId) {
       messageApi.error("图片地址不存在，无法下载");
       return;
     }
     try {
       // 调用后端下载接口，期望返回 blob 或包含可访问 url 的 data
-      const res = await downloadImage({ id: file.id });
+      const res = await downloadImage({ id: imageId });
 
       // 尝试从响应中取出 Blob 或 URL
       let imageUrl: string | undefined;
@@ -149,31 +156,34 @@ export default function PictureUpload({
         return;
       }
 
-      // 将下载得到的图片显示到图片列表中（更新对应项或新增）
-      setFileList((prev) => {
-        const idx = prev.findIndex(
-          (f: any) => (f as any).id === file.id || (f as any).uid === file.uid
-        );
-        const newItem: UploadFile = {
-          uid: file.id,
-          name: file.name || "图片",
-          status: "done",
-          url: imageUrl,
-          // 保留后端 id 以便后续操作
-          ...(file.id ? { id: file.id } : {}),
-        } as UploadFile;
+      return imageUrl;
 
-        if (idx >= 0) {
-          const copy = [...prev];
-          copy[idx] = { ...copy[idx], ...newItem };
-          return copy;
-        } else {
-          return [...prev, newItem];
-        }
-      });
+      // 将下载得到的图片显示到图片列表中（更新对应项或新增）
+      // setFileList((prev) => {
+      //   const idx = prev.findIndex(
+      //     (f: any) => (f as any).id === file.id || (f as any).uid === file.uid
+      //   );
+      //   const newItem: UploadFile = {
+      //     uid: file.id,
+      //     name: file.name || "图片",
+      //     status: "done",
+      //     url: imageUrl,
+      //     // 保留后端 id 以便后续操作
+      //     ...(file.id ? { id: file.id } : {}),
+      //   } as UploadFile;
+
+      //   if (idx >= 0) {
+      //     const copy = [...prev];
+      //     copy[idx] = { ...copy[idx], ...newItem };
+      //     return copy;
+      //   } else {
+      //     return [...prev, newItem];
+      //   }
+      // });
     } catch (err) {
       console.error(err);
       messageApi.error("图片下载失败");
+      return;
     }
   };
 
@@ -230,7 +240,7 @@ export default function PictureUpload({
               />
             ),
           }}
-          onDownload={handleDownload}
+          // onDownload={handleDownload}
         >
           {fileList.length >= 5 || !jczNo ? null : uploadButton}
         </Upload>

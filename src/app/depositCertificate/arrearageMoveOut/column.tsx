@@ -1,6 +1,7 @@
 import { JCZDataType, JXDataType } from "@/utils/types";
 import {
   Button,
+  Modal,
   Space,
   TableColumnsType,
   type TableProps,
@@ -29,6 +30,11 @@ export const setRefreshCallback = (
   cb: ((type: "error" | "success", message: string) => void) | undefined
 ) => {
   refreshCallback = cb;
+};
+
+let printCallback: (detailData: any) => void;
+export const setPrintCallback = (cb: (detailData: any) => void) => {
+  printCallback = cb;
 };
 
 const caTypeMap = {
@@ -224,6 +230,13 @@ const columns: TableProps<JCZDataType>["columns"] = [
             >
               详情
             </Link>
+            <a
+              onClick={() => {
+                printCallback(record);
+              }}
+            >
+              打印缴费单
+            </a>
           </Space>
         );
       } else {

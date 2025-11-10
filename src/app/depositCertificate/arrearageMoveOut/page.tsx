@@ -1,17 +1,25 @@
 "use client";
-import { Table, theme, Button, message } from "antd";
+import { Table, theme, Button, message, Modal } from "antd";
 // import { useRouter } from 'next/navigation';
 import AvaForm from "./AvaForm";
-import { columns, data, expandColumns, setRefreshCallback } from "./column";
+import {
+  columns,
+  data,
+  expandColumns,
+  setRefreshCallback,
+  setPrintCallback,
+} from "./column";
 // import Layout from "@/components/Layout";
 import styles from "./index.module.less";
-import { useCallback, useEffect, useState } from "react";
-import { JCZFilter, JXDataType } from "@/utils/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { JCZDataType, JCZFilter, JXDataType } from "@/utils/types";
 import { jczApi, exportJcz } from "../api";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useSetRoomList } from "@/utils/store/useConfigStore";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { stat } from "fs";
+import PrintContent from "../detail/components/printContent";
+import { useReactToPrint } from "react-to-print";
 
 export default function User() {
   const { token } = theme.useToken();
@@ -88,6 +96,10 @@ export default function User() {
         messageApi.success(message);
       }
     });
+    setPrintCallback((detailData: any) => {
+      setDetailData(detailData);
+      setShowFee(true);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNum, pageSize, jczFilter]);
 
@@ -103,6 +115,15 @@ export default function User() {
       setPageNum(1);
     }
   }, []);
+
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
+  const [showFee, setShowFee] = useState<boolean>(false);
+  const [detailData, setDetailData] = useState<JCZDataType>({ jczNo: "" });
+
+  const printFee = () => {
+    reactToPrintFn();
+  };
 
   return (
     <main className={styles.userWrap}>
@@ -132,6 +153,20 @@ export default function User() {
           />
         </div>
       </div>
+      <Modal
+        title="打印缴费单"
+        open={showFee}
+        onOk={() => {
+          setShowFee(false);
+          printFee();
+        }}
+        onCancel={() => {
+          setShowFee(false);
+        }}
+        width={650}
+      >
+        <PrintContent ref={contentRef} data={detailData} />
+      </Modal>
     </main>
   );
 }
