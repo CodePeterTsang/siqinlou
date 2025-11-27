@@ -59,7 +59,7 @@ export default function Note({
             <TextArea
               disabled={noteDisabled}
               showCount
-              maxLength={100}
+              maxLength={300}
               style={{ height: 100, resize: "none" }}
             />
           </Form.Item>

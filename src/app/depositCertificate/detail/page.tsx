@@ -161,6 +161,10 @@ export default function DepositCertificateDetail() {
         operation: 1,
       });
       messageApi.success("注销成功");
+      getDepositCertificateDetail({
+        roomNo: detailData.roomNo || "",
+        caNo: detailData.caNo || "",
+      });
     } catch (e: any) {
       messageApi.error(e?.errorMessage);
     }

@@ -111,7 +111,11 @@ export default function Agent({
             variant={agentIsRevise ? "outlined" : "borderless"}
           />
         </Form.Item>
-        <Form.Item<FieldType> label="电话" name="phoneNum">
+        <Form.Item<FieldType>
+          label="电话"
+          name="phoneNum"
+          style={{ width: "100%" }}
+        >
           <Input
             placeholder="电话"
             disabled={!agentIsRevise}
