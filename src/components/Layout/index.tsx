@@ -24,7 +24,7 @@ import styles from "./index.module.less";
 import { getUser, removeToken, removeUser } from "@/utils/auth";
 import { usePathname } from "next/navigation";
 import zhCN from "antd/es/locale/zh_CN";
-import { logoutApi } from "@/app/login/api";
+import { logoutApi } from "@/app/appLogin/api";
 import dynamic from "next/dynamic";
 import "dayjs/locale/zh-cn";
 import dayjs from "dayjs";
@@ -70,7 +70,7 @@ const CommonLayout: React.FC<IProps> = ({
       await logoutApi(userNo);
       removeToken();
       removeUser();
-      router.push("./login");
+      router.push("./appLogin");
     } catch (e) {}
   };
 
@@ -111,7 +111,7 @@ const CommonLayout: React.FC<IProps> = ({
         },
       }}
     >
-      {pathname === "/login" ? (
+      {pathname === "/appLogin" ? (
         <>{children}</>
       ) : (
         <Layout style={{ minHeight: "100vh" }}>

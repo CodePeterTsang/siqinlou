@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
    */
 
   const { pathname } = request.nextUrl;
-  const whiteList = ["/login", "/403", "/404", "/500"];
+  const whiteList = ["/appLogin", "/403", "/404", "/500"];
   const isWhite = whiteList.includes(pathname);
 
   if (isWhite) {
@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
   } else {
     const token = request.cookies.get("SHIXI_TOKEN" as any)?.value;
     if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/appLogin", request.url));
     } else {
       return NextResponse.next();
     }

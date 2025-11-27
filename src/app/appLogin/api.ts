@@ -1,7 +1,7 @@
 import req from "@/utils/req";
 
 export const loginApi = (userNo: string, password: string) =>
-  req.post("/api/user/login", { userNo, password });
+  req.post("/api/user/appLogin", { userNo, password });
 
 export const registerApi = (userNo: string, pwd: string, userName: string) =>
   req.post("/api/user/create", { userNo, pwd, userName });

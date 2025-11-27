@@ -23,7 +23,7 @@ import {
   userEditApi,
   userListApi,
 } from "../api";
-import { logoutApi } from "@/app/login/api";
+import { logoutApi } from "@/app/appLogin/api";
 import router from "next/router";
 
 export default function User() {
