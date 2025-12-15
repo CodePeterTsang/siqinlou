@@ -117,6 +117,24 @@ export default function PictureUpload({
           if (onSuccess) {
             onSuccess(res, file as any);
           }
+
+          if (file instanceof Blob) {
+            const imageUrl = URL.createObjectURL(file);
+            // 上传成功后更新图片列表
+            setFileList((prev) =>
+              prev.map((f) =>
+                f.uid === (res as any).id
+                  ? {
+                      ...f,
+                      status: "done",
+                      url: imageUrl,
+                      name: (res as any).imageName || "图片",
+                      uid: (res as any).id,
+                    }
+                  : f
+              )
+            );
+          }
         } else {
           if (onError) {
             onError(new Error("上传失败"));
