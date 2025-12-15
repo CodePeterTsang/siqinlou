@@ -1,6 +1,6 @@
 
 # Make sure it uses up to date node js version
-FROM node:23-alpine AS base
+FROM docker.m.daocloud.io/node:23-alpine AS base
 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
