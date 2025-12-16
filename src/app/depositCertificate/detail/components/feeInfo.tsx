@@ -1,19 +1,8 @@
 "use client";
-import {
-  Col,
-  Flex,
-  Form,
-  FormProps,
-  Input,
-  InputNumber,
-  Row,
-  Table,
-  TableProps,
-  theme,
-} from "antd";
-import { DatePicker, Space } from "antd";
+import { Col, Form, FormProps, Input, InputNumber, Row, theme } from "antd";
 import dayjs from "dayjs";
 import { useEffect } from "react";
+import { JXDataType, XRDataType } from "@/utils/types";
 
 interface DataType {
   key: string;
@@ -35,13 +24,15 @@ export default function FeeInfo({
   showFeeDetail,
   caType = 1,
   feeInfoCb,
-  xrLength = 1,
+  xrList = [],
+  lastJfDetail,
 }: {
   startYear: string | undefined;
   showFeeDetail: boolean;
   caType: 1 | 2 | 3 | 4 | undefined;
   feeInfoCb: (value: number) => void;
-  xrLength: number | undefined;
+  xrList?: XRDataType[];
+  lastJfDetail?: JXDataType;
 }) {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
@@ -63,6 +54,7 @@ export default function FeeInfo({
   ) => {
     const beginYear = startYear ? parseInt(startYear) + 1 : dayjs().year();
     const yearRange = beginYear + parseInt(values.yearCount) - 1;
+    const xrLength = xrList ? xrList.length : 0;
     const unit = caType > xrLength ? caType : xrLength;
     form.setFieldsValue({
       yearRange: `${beginYear}-${yearRange}`,
@@ -74,9 +66,36 @@ export default function FeeInfo({
   };
 
   useEffect(() => {
-    const beginYear = startYear ? parseInt(startYear) + 1 : dayjs().year();
-
     if (showFeeDetail) {
+      // 上一次缴费人数
+      const lastJfCount = lastJfDetail ? parseInt(lastJfDetail.jfCount) : 0;
+      const xrLength = xrList ? xrList.length : 0;
+      const lastXr =
+        xrList && xrList.length > 0 ? xrList[xrList.length - 1] : null;
+
+      // 上一次缴费人数跟本次寄存人数差值，如果存在差值，即算是新迁入，需要先缴清差值部分
+      const xrLengthAndLastJfCountDiff =
+        xrLength && xrLength - lastJfCount > 0 ? xrLength - lastJfCount : 0;
+      if (xrLengthAndLastJfCountDiff > 0) {
+        const beginYear = new Date(lastXr ? lastXr.created : "").getFullYear();
+        const endYear = startYear ? parseInt(startYear) : dayjs().year();
+        const yearCount = endYear - beginYear + 1;
+        const unit =
+          caType > xrLengthAndLastJfCountDiff
+            ? caType
+            : xrLengthAndLastJfCountDiff;
+        form.setFieldsValue({
+          yearRange: `${beginYear}-${endYear}`,
+          yearCount: yearCount,
+          jfTotal: unit * 150 * yearCount,
+          jfType: "寄存证年费",
+          jfCount: unit,
+        });
+        feeInfoCb(yearCount);
+        return;
+      }
+      const beginYear = startYear ? parseInt(startYear) + 1 : dayjs().year();
+
       const unit = caType > xrLength ? caType : xrLength;
 
       let range = 1;
@@ -101,7 +120,7 @@ export default function FeeInfo({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFeeDetail, startYear, caType, xrLength]);
+  }, [showFeeDetail, startYear, caType, xrList]);
 
   return (
     <main>

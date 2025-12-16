@@ -385,29 +385,54 @@ export default function DepositCertificateDetail() {
     const { data } = await managerApi();
 
     try {
-      const startYear = detailData.jfEndYear
-        ? detailData.jfEndYear + 1
-        : dayjs().year();
-      const endYear = parseInt(startYear as string) + feeCount - 1;
-      const xrLength = detailData.xrList?.length || 0;
-      const unit =
-        detailData.caType && detailData.caType > xrLength
-          ? detailData.caType
-          : xrLength;
+      const { jfList, xrList, jfEndYear, caType, jczNo, roomNo, caNo } =
+        detailData;
+      const lastJfCount = jfList ? parseInt(jfList[0].jfCount) : 0;
+      const xrLength = xrList?.length || 0;
+      const lastXr =
+        xrList && xrList.length > 0 ? xrList[xrList.length - 1] : null;
+      // 上一次缴费人数跟本次寄存人数差值，如果存在差值，即算是新迁入，需要先缴清差值部分
+      const xrLengthAndLastJfCountDiff =
+        xrLength && xrLength - lastJfCount > 0 ? xrLength - lastJfCount : 0;
 
-      await jfdPayApi({
-        jczNo: detailData.jczNo,
-        startYear: `${startYear}`,
-        endYear: `${endYear}`,
-        operator: userData.userName,
-        yearCount: `${feeCount}`,
-        money: `${feeCount * unit * 150}`,
-        jfCount: `${unit}`,
-        manager: data,
-      });
+      if (xrLengthAndLastJfCountDiff > 0) {
+        const startYear = new Date(lastXr ? lastXr.created : "").getFullYear();
+        const endYear = jfEndYear ? parseInt(jfEndYear) : dayjs().year();
+        const unit =
+          caType && caType > xrLengthAndLastJfCountDiff
+            ? caType
+            : xrLengthAndLastJfCountDiff;
+
+        await jfdPayApi({
+          jczNo: jczNo,
+          startYear: `${startYear}`,
+          endYear: `${endYear}`,
+          operator: userData.userName,
+          yearCount: `${feeCount}`,
+          money: `${feeCount * unit * 150}`,
+          jfCount: `${unit}`,
+          manager: data,
+        });
+      } else {
+        const startYear = jfEndYear ? jfEndYear + 1 : dayjs().year();
+        const endYear = parseInt(startYear as string) + feeCount - 1;
+        const unit = caType && caType > xrLength ? caType : xrLength;
+
+        await jfdPayApi({
+          jczNo: jczNo,
+          startYear: `${startYear}`,
+          endYear: `${endYear}`,
+          operator: userData.userName,
+          yearCount: `${feeCount}`,
+          money: `${feeCount * unit * 150}`,
+          jfCount: `${unit}`,
+          manager: data,
+        });
+      }
+
       getDepositCertificateDetail({
-        roomNo: detailData.roomNo || "",
-        caNo: detailData.caNo || "",
+        roomNo: roomNo || "",
+        caNo: caNo || "",
       });
       setShowFee(true);
       scrollToTop();
@@ -934,7 +959,8 @@ export default function DepositCertificateDetail() {
             feeInfoCb={(value) => {
               setFeeCount(value);
             }}
-            xrLength={detailData?.xrList?.length}
+            xrList={detailData?.xrList}
+            lastJfDetail={detailData?.jfList && detailData?.jfList[0]}
           />
         </Card>
       </Flex>
