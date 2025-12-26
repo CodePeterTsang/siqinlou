@@ -24,10 +24,12 @@ interface DataType {
 
 // 模块内可设置的刷新回调，父组件可通过 setRefreshCallback 注入刷新函数
 let refreshCallback:
-  | ((type: "error" | "success", message: string) => void)
+  | ((type: "error" | "success", message: string, detailData?: any) => void)
   | undefined;
 export const setRefreshCallback = (
-  cb: ((type: "error" | "success", message: string) => void) | undefined
+  cb:
+    | ((type: "error" | "success", message: string, detailData?: any) => void)
+    | undefined
 ) => {
   refreshCallback = cb;
 };
@@ -205,7 +207,8 @@ const columns: TableProps<JCZDataType>["columns"] = [
                   if (res) {
                     try {
                       if (refreshCallback)
-                        refreshCallback("success", "清缴成功");
+                        refreshCallback("success", "清缴成功", record);
+                      // printCallback(record);
                     } catch (e) {
                       console.error("refresh callback error", e);
                       if (refreshCallback) refreshCallback("error", "清缴失败");

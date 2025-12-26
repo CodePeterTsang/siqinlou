@@ -88,14 +88,22 @@ export default function User() {
 
   useEffect(() => {
     initJCZList();
-    setRefreshCallback((type: "error" | "success", message: string) => {
-      if (type === "error") {
-        messageApi.error(message);
-      } else {
-        initJCZList();
-        messageApi.success(message);
+    setRefreshCallback(
+      (type: "error" | "success", message: string, detailData?: any) => {
+        if (type === "error") {
+          messageApi.error(message);
+        } else {
+          messageApi.success(message);
+          if (detailData) {
+            setDetailData(detailData);
+            setShowFee(true);
+            updateSingleJCZ(detailData);
+          } else {
+            initJCZList();
+          }
+        }
       }
-    });
+    );
     setPrintCallback((detailData: any) => {
       setDetailData(detailData);
       setShowFee(true);
@@ -108,6 +116,23 @@ export default function User() {
     setPageSize(parseInt(searchParams.get("pageSize") || "5"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const updateSingleJCZ = useCallback(
+    async (detailData: JCZDataType) => {
+      setListData((listData) =>
+        listData.map((item) => {
+          if (item.jczNo === detailData.jczNo) {
+            return {
+              ...item,
+              status: 3, // 已清缴
+            };
+          }
+          return item;
+        })
+      );
+    },
+    [listData]
+  );
 
   const onFilter = useCallback((value: JCZFilter, initPageSize: boolean) => {
     setJCZFilter(value);

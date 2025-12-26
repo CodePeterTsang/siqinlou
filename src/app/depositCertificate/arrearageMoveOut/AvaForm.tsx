@@ -77,7 +77,7 @@ const AdvancedSearchForm = ({
       type: "input",
     },
     {
-      label: "欠费状态",
+      label: "状态",
       key: "status",
       placeholder: "请选择注销状态",
       options: [
@@ -189,6 +189,7 @@ const AdvancedSearchForm = ({
                   placeholder={searchLabels[index].placeholder}
                   optionFilterProp="label"
                   options={searchLabels[index].options}
+                  allowClear
                 ></Select>
               )}
             </Form.Item>
